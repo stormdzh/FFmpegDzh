@@ -40,4 +40,11 @@
         android:layout_marginTop="10dp"
         android:text="c++停止线程" />
 
+    <Button
+        android:id="@+id/btnCoustom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="生产者和消费者" />
+
 </LinearLayout>

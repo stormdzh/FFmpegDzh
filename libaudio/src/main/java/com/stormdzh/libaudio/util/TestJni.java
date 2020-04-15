@@ -23,6 +23,8 @@ public class TestJni {
     //停止线程
     public native void stopNormalThread();
 
+    public native void mutexThread();
+
     public String getStringFromJNI() {
 
         return stringFromJni();
@@ -32,6 +34,30 @@ public class TestJni {
 
         return testFFmpeg();
     }
+
+
+
+
+    private OnErrerListener onErrerListener;
+
+    public void setOnErrerListener(OnErrerListener onErrerListener) {
+        this.onErrerListener = onErrerListener;
+    }
+
+    public void onError(int code, String msg)
+    {
+        if(onErrerListener != null)
+        {
+            onErrerListener.onError(code, msg);
+        }
+    }
+
+    public interface OnErrerListener
+    {
+        void onError(int code, String msg);
+    }
+
+    public native  void callbackFromC();
 
 
 }

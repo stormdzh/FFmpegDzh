@@ -27,15 +27,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
+        findViewById(R.id.btnCoustom).setOnClickListener(this);
 
 
         mTestJni = new TestJni();
 
 
-//        Log.i(TAG, "getStringFromJNI:" + mTestJni.getStringFromJNI());
-//        tvTest.setText(mTestJni.getStringFromJNI());
-//        Log.i(TAG, "获取到ffmpeg版本号:" + mTestJni.getTestFFmpeg());
-//        tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.getTestFFmpeg());
+        Log.i(TAG, "getStringFromJNI:" + mTestJni.getStringFromJNI());
+        tvTest.setText(mTestJni.getStringFromJNI());
+        Log.i(TAG, "获取到ffmpeg版本号:" + mTestJni.getTestFFmpeg());
+        tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.getTestFFmpeg());
     }
 
     @Override
@@ -46,6 +47,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnStopNormalThread:
                 mTestJni.stopNormalThread();
+                break;
+            case R.id.btnCoustom:
+                mTestJni.mutexThread();
+                mTestJni.callbackFromC();
+                mTestJni.setOnErrerListener(new TestJni.OnErrerListener(){
+                    @Override
+                    public void onError(int code, String msg) {
+                        Log.i("MFFMPEG","code:"+code+"  msg:"+msg);
+                    }
+                });
                 break;
         }
     }

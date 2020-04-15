@@ -9,7 +9,8 @@ add_library( # Sets the name of the library.
         native-lib
         # Sets the library as a shared library.
         SHARED
-        src/main/cpp/native-lib.cpp)
+        src/main/cpp/native-lib.cpp
+        src/main/cpp/JavaListener.cpp)
 
 
 add_library(avcodec-58
