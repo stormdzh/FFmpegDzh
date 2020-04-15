@@ -1,0 +1,2 @@
+include ':app', ':libaudio'
+rootProject.name='FFmpegDzh'
