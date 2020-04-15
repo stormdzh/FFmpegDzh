@@ -4,6 +4,10 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <unistd.h>
+#include "AndroidLog.h"
+
+#include "pthread.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -11,9 +15,7 @@ extern "C" {
 }
 
 
-#define TAG "MFFMPEG"
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+
 
 extern "C"
 JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_stringFromJni(JNIEnv *env,
@@ -51,3 +53,40 @@ JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_testFFmpeg(JNI
     LOGI("avcodec_version:%s", versionInfo);
     return env->NewStringUTF(versionInfo);
 }
+
+//-----------------------测试线程开始------------------------------------
+pthread_t thread;
+int threadRuning = 1;
+
+void *normalCallBack(void *data) {
+    while (threadRuning > 0 && thread != NULL) {
+        LOGD("create normal thread from C++!");
+        sleep(2);
+    }
+    //一定要加ruturn 不然报错：A/libc: Fatal signal 4 (SIGILL), code 1, fault addr 0xe63a3456 in tid 8875
+    return nullptr;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_normalThread(JNIEnv *env, jobject thiz) {
+    LOGD("创建线程");
+    threadRuning = 1;
+    int result = pthread_create(&thread, NULL, normalCallBack, NULL);
+
+    LOGD("pthread_create result:%d",result);
+
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_stopNormalThread(JNIEnv *env, jobject thiz) {
+    LOGD("停止线程");
+    threadRuning = 0;
+    if (thread != NULL) {
+        pthread_detach(thread);
+        pthread_exit(&thread);
+    }
+}
+
+//-----------------------测试线程结束------------------------------------

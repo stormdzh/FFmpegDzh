@@ -66,5 +66,8 @@ target_link_libraries(
         swresample-3
         swscale-5
         postproc-55
+        # 链接 android ndk 自带的一些库
+        android
         log
+        ${log-lib}  ${android-lib}
 )

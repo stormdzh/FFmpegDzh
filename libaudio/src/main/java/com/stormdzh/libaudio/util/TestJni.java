@@ -11,9 +11,17 @@ public class TestJni {
         System.loadLibrary("native-lib");
     }
 
+    //测试获取字符串
     private native String stringFromJni();
 
+    //获取ffmpeg的版本号
     private native String testFFmpeg();
+
+    //创建线程
+    public native void normalThread();
+
+    //停止线程
+    public native void stopNormalThread();
 
     public String getStringFromJNI() {
 
@@ -24,5 +32,6 @@ public class TestJni {
 
         return testFFmpeg();
     }
+
 
 }
