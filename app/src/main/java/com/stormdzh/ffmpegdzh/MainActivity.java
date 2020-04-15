@@ -20,5 +20,6 @@ public class MainActivity extends Activity {
 
 
         Log.i(TAG, "getStringFromJNI:" + mTestJni.getStringFromJNI());
+        Log.i(TAG, "获取到ffmpeg版本号:" + mTestJni.getTestFFmpeg());
     }
 }

@@ -13,9 +13,16 @@ public class TestJni {
 
     private native String stringFromJni();
 
-    public String getStringFromJNI(){
+    private native String testFFmpeg();
+
+    public String getStringFromJNI() {
 
         return stringFromJni();
+    }
+
+    public String getTestFFmpeg() {
+
+        return testFFmpeg();
     }
 
 }

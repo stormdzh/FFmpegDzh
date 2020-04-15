@@ -16,10 +16,10 @@ android {
             }
         }
         ndk {
-            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi'
         }
         sourceSets.main {
-            jniLibs.srcDir 'libs'
+            jniLibs.srcDir 'src/main/jniLibs'
         }
     }
 
