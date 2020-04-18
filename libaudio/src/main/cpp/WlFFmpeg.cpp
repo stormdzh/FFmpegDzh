@@ -104,8 +104,11 @@ void WlFFmpeg::start() {
         return;
     }
 
+    //调用播放
+    audio->play();
+
     int count = 0;
-    while (1) {
+    while (playState != NULL && !playState->exit) {
         AVPacket *pPacket = av_packet_alloc();
         if (av_read_frame(pFormatCtx, pPacket) == 0) {
 
@@ -121,19 +124,27 @@ void WlFFmpeg::start() {
         } else {
             av_packet_free(&pPacket);
             av_free(pPacket);
-            break;
+
+            if (playState != NULL && !playState->exit) {
+                if (audio->queue->getQueueSize() > 0) {
+                    continue;
+                } else {
+                    playState->exit = true;
+                    break;
+                }
+            }
         }
 
     }
     //当上面的代码break，后测试从队列里面获取AVPacket
-    while (audio->queue->getQueueSize() > 0) {
-        AVPacket *pPacket = av_packet_alloc();
-        audio->queue->getAvPacket(pPacket);
-        av_packet_free(&pPacket);
-        av_free(pPacket);
-        pPacket = NULL;
-
-    }
+//    while (audio->queue->getQueueSize() > 0) {
+//        AVPacket *pPacket = av_packet_alloc();
+//        audio->queue->getAvPacket(pPacket);
+//        av_packet_free(&pPacket);
+//        av_free(pPacket);
+//        pPacket = NULL;
+//
+//    }
 
     LOGE("解码完成");
 
