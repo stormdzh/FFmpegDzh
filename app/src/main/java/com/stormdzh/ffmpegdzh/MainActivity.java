@@ -94,6 +94,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 //播放pcm
             case R.id.btnPlayPcm:
                 File pcmFile = new File(Environment.getExternalStorageDirectory(), "mydream.pcm");
+//                File pcmFile = new File(Environment.getExternalStorageDirectory(), "resample.pcm");
                 mTestJni.playPcm(pcmFile.getAbsolutePath());
                 break;
             case R.id.btnStart:

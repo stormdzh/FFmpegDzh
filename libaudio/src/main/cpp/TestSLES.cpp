@@ -53,7 +53,7 @@ TestSLES::TestSLES(const char *url) {
 
 
     //-------------------------------------------
-    SLObjectItf outPutMixObject;
+    SLObjectItf outPutMixObject=NULL;
     SLEnvironmentalReverbItf outEnvironmentalReverbItf = NULL;
 
     const SLInterfaceID mids[1] = {SL_IID_ENVIRONMENTALREVERB};
@@ -70,7 +70,7 @@ TestSLES::TestSLES(const char *url) {
     //-------------------------------------------
     //创建播放器
     SLObjectItf pcmPlayerObj = NULL;
-    SLPlayItf pcmPlayer;
+    SLPlayItf pcmPlayer=NULL;
     SLDataLocator_OutputMix outPutMix = {SL_DATALOCATOR_OUTPUTMIX, outPutMixObject};
     SLDataSink slDataSink = {&outPutMix, NULL};
 
