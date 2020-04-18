@@ -8,6 +8,7 @@
 class WlPlayState{
 public:
     bool exit;
+    bool load = true;
 public:
     WlPlayState();
     ~WlPlayState();

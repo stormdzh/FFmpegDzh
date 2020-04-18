@@ -52,7 +52,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         //当前流是音频
         if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
-                audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate);
+                audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,callJava);
                 audio->streamIndex = i;
                 audio->codecpar = pParameters;
             }

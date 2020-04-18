@@ -19,6 +19,7 @@ public:
     JNIEnv *jniEnv = NULL;
     jobject jobj;
     jmethodID jmid_prepare;
+    jmethodID jmid_load;
 
 public:
     WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *jobj);
@@ -26,6 +27,8 @@ public:
     ~WlCallJava();
 
     void onCallPrepare(int type);
+
+    void onCallLoad(int type, bool load);
 
 };
 

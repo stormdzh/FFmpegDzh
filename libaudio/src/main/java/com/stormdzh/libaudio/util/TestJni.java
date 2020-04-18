@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class TestJni {
 
-    private static final String TAG = "MFFMPEG";
+    private static final String TAG = "MFFMPEGJNI";
 
     static {
         System.loadLibrary("native-lib");
@@ -71,6 +71,7 @@ public class TestJni {
         }else{
             Log.i(TAG, "可以播放");
         }
+        onCallLoad(true);
         prepare(mSource);
     }
 
@@ -99,6 +100,16 @@ public class TestJni {
     }
 
     public native void start();
+
+
+    public void onCallLoad(boolean load){
+        Log.i(TAG, "onCallLoad load:"+load);
+        if(load){
+            Log.i(TAG, "加载中。。。。。。。");
+        }else{
+            Log.i(TAG, "播放中。。。。。。。");
+        }
+    }
 
     //-----------------------------------
 

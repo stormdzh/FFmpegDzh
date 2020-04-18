@@ -4,8 +4,9 @@
 
 #include "WlAudio.h"
 
-WlAudio::WlAudio(WlPlayState *playState, int sample_rate) {
+WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) {
 
+    this->callJava = callJava;
     this->sample_rate = sample_rate;
     this->playState = playState;
     queue = new WlQueue(playState);
@@ -33,6 +34,19 @@ void WlAudio::play() {
 int WlAudio::resampleAudio() {
 
     while (playState != NULL && !playState->exit) {
+
+        if (queue->getQueueSize() <= 0) {
+            if (!playState->load) {
+                playState->load = true;
+                callJava->onCallLoad(CHILD_THREAD, true);
+            }
+            continue;
+        } else {
+            if (playState->load) {
+                playState->load = false;
+                callJava->onCallLoad(CHILD_THREAD, false);
+            }
+        }
 
         avPacket = av_packet_alloc();
 
@@ -182,7 +196,7 @@ void WlAudio::initOpenSLES() {
             SL_DATAFORMAT_PCM,
             2,
 //            SL_SAMPLINGRATE_44_1,
-            (SLuint32)getCurrentSampleRateForOpensles(sample_rate),
+            (SLuint32) getCurrentSampleRateForOpensles(sample_rate),
             SL_PCMSAMPLEFORMAT_FIXED_16,
             SL_PCMSAMPLEFORMAT_FIXED_16,
             SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,

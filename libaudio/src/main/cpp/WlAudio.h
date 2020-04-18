@@ -10,6 +10,8 @@
 #include "pthread.h"
 #include "string"
 
+#include "WlCallJava.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswresample/swresample.h>
@@ -21,6 +23,8 @@ extern "C" {
 
 class WlAudio {
 public:
+    WlCallJava *callJava=NULL;
+
     int streamIndex = -1;
     AVCodecParameters *codecpar;
     AVCodecContext *avCodecContext;
@@ -52,7 +56,7 @@ public:
 
 public:
 
-    WlAudio(WlPlayState *playState,int sample_rate);
+    WlAudio(WlPlayState *playState,int sample_rate,WlCallJava *callJava);
 
     ~WlAudio();
 

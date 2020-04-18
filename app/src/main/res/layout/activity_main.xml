@@ -70,6 +70,15 @@
         android:layout_marginTop="10dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:text="播放音频" />
+        android:text="开始播放" />
+
+    <Button
+        android:id="@+id/btnPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="暂停" />
 
 </LinearLayout>
