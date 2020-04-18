@@ -48,6 +48,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnStart).setOnClickListener(this);
         findViewById(R.id.btnPause).setOnClickListener(this);
         findViewById(R.id.btnResume).setOnClickListener(this);
+        findViewById(R.id.btnStop).setOnClickListener(this);
 
 
         mTestJni = new TestJni();
@@ -166,6 +167,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnResume:
                 mTestJni.resume();
+                break;
+            case R.id.btnStop:
+                mTestJni.stop();
                 break;
         }
     }

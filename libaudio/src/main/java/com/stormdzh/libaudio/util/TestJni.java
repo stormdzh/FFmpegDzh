@@ -129,6 +129,12 @@ public class TestJni {
         }
     }
 
+    public void stop() {
+        nstop();
+    }
+
+    public native void nstop();
+
     //-----------------------------------
 
 }

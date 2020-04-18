@@ -9,3 +9,7 @@ WlPlayState::WlPlayState() {
     exit = false;
 
 }
+
+WlPlayState::~WlPlayState() {
+
+}

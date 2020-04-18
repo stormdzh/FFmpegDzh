@@ -299,3 +299,65 @@ void WlAudio::resume() {
         return;
     (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PLAYING);
 }
+
+void WlAudio::stop() {
+    if (pcmPlayer == NULL)
+        return;
+    (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_STOPPED);
+
+}
+
+void WlAudio::release() {
+    //停止音频
+    stop();
+    //释放队列
+    if (queue != NULL) {
+        delete (queue);
+        queue = NULL;
+    }
+    //释放博放器
+    if (pcmPlayerObj != NULL) {
+        (*pcmPlayerObj)->Destroy(pcmPlayerObj);
+        pcmPlayerObj = NULL;
+
+        pcmPlayer = NULL;
+        pcmBufferQueue = NULL;
+    }
+
+    if (outPutMixObject != NULL) {
+        (*outPutMixObject)->Destroy(outPutMixObject);
+        outPutMixObject = NULL;
+        outEnvironmentalReverbItf = NULL;
+    }
+
+    if (engineObject != NULL) {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+    //释放buffer
+    if (buffer != NULL) {
+        free(buffer);
+        buffer = NULL;
+    }
+
+    //释放解码器上下文
+    if (avCodecContext != NULL) {
+        avcodec_close(avCodecContext);
+        avcodec_free_context(&avCodecContext);
+        avCodecContext = NULL;
+    }
+
+    //释放创建的对象
+    if (playState != NULL) {
+        playState = NULL;
+    }
+
+    if (callJava != NULL) {
+        callJava = NULL;
+    }
+}
+
+WlAudio::~WlAudio() {
+
+}

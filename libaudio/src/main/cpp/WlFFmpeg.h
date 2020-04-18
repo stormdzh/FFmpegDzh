@@ -11,10 +11,10 @@
 #include "WlCallJava.h"
 #include "WlAudio.h"
 
-
 extern "C"
 {
 #include "libavformat/avformat.h"
+#include <libavutil/time.h>
 };
 
 class WlFFmpeg {
@@ -26,6 +26,10 @@ public:
     AVFormatContext *pFormatCtx = NULL;
     WlAudio *audio = NULL;
     WlPlayState *playState = NULL;
+
+    pthread_mutex_t init_mutex;
+
+    bool initexit=false;
 public:
 
     WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url);
@@ -40,7 +44,10 @@ public:
 
 
     void pause();
+
     void resume();
+
+    void release();
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H

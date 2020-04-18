@@ -72,3 +72,7 @@ void WlCallJava::onCallTimeInfo(int type, int curTime, int duration) {
     }
 }
 
+WlCallJava::~WlCallJava() {
+
+}
+

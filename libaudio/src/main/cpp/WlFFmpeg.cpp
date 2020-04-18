@@ -2,13 +2,13 @@
 // Created by tal on 2020-04-18.
 //
 
-
 #include "WlFFmpeg.h"
 
 WlFFmpeg::WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url) {
     this->playState = playState;
     this->callJava = callJava;
     this->url = url;
+    pthread_mutex_init(&init_mutex, NULL);
 }
 
 void *decodeFFmpeg(void *data) {
@@ -24,16 +24,37 @@ void WlFFmpeg::prepare() {
     pthread_create(&decodeThread, NULL, decodeFFmpeg, this);
 }
 
+
+//加载过程中，退出中断锁，可以正常退出
+int avformat_callback(void *ctx) {
+
+    WlFFmpeg *fFmpeg = (WlFFmpeg *) ctx;
+    if (fFmpeg->playState->exit) {
+        return AVERROR_EOF;
+    }
+    return 0;
+}
+
 void WlFFmpeg::decodeFFmpegThread() {
+
+    pthread_mutex_lock(&init_mutex);
 
     av_register_all();
     avformat_network_init();
-    this->pFormatCtx = avformat_alloc_context();
+    pFormatCtx = avformat_alloc_context();
+
+    //异常处理
+    pFormatCtx->interrupt_callback.callback = avformat_callback;
+    pFormatCtx->interrupt_callback.opaque = this;
+
+
     //打开输入流文件
     int code_open_input = avformat_open_input(&pFormatCtx, url, NULL, NULL);
     if (code_open_input != 0) {
         char *string = av_err2str(code_open_input);
         LOGE("avformat_open_input 失败:%s", string);
+        pthread_mutex_unlock(&init_mutex);
+        initexit = true;
         return;
     } else {
         LOGE("avformat_open_input 成功");
@@ -42,6 +63,8 @@ void WlFFmpeg::decodeFFmpegThread() {
     int code_find_stream_info = avformat_find_stream_info(pFormatCtx, NULL);
     if (code_find_stream_info != 0) {
         LOGE("code_find_stream_info 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
         return;
     } else {
         LOGE("code_find_stream_info 成功");
@@ -68,6 +91,8 @@ void WlFFmpeg::decodeFFmpegThread() {
     AVCodec *pCodec = avcodec_find_decoder(audio->codecpar->codec_id);
     if (pCodec == NULL) {
         LOGE("avcodec_find_decoder 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
         return;
     } else {
         LOGE("avcodec_find_decoder 成功");
@@ -76,6 +101,8 @@ void WlFFmpeg::decodeFFmpegThread() {
     audio->avCodecContext = avcodec_alloc_context3(pCodec);
     if (audio->avCodecContext == NULL) {
         LOGE("avcodec_alloc_context3 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
         return;
     } else {
         LOGE("avcodec_alloc_context3 成功");
@@ -86,6 +113,8 @@ void WlFFmpeg::decodeFFmpegThread() {
 
     if (code_parameters_to_context < 0) {
         LOGE("code_parameters_to_context 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
         return;
     } else {
         LOGE("code_parameters_to_context 成功");
@@ -95,12 +124,15 @@ void WlFFmpeg::decodeFFmpegThread() {
     int code_avcodec_open = avcodec_open2(audio->avCodecContext, pCodec, 0);
     if (code_avcodec_open < 0) {
         LOGE("code_avcodec_open 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
         return;
     } else {
         LOGE("code_avcodec_open 成功");
     }
     LOGE("音频准备完毕");
     callJava->onCallPrepare(CHILD_THREAD);
+    pthread_mutex_unlock(&init_mutex);
 
 }
 
@@ -151,6 +183,7 @@ void WlFFmpeg::start() {
 //
 //    }
 
+    initexit = true;
     LOGE("解码完成");
 
 }
@@ -166,4 +199,50 @@ void WlFFmpeg::resume() {
     if (audio != NULL) {
         audio->resume();
     }
+}
+
+void WlFFmpeg::release() {
+    if (playState != NULL && playState->exit) {
+        return;
+    }
+    playState->exit = true;
+
+    pthread_mutex_lock(&init_mutex);
+
+    int sleepCount = 0;
+    while (!initexit) {
+        if (sleepCount > 1000) {
+            initexit = true;
+        }
+        LOGE("release  sleepCount %d", sleepCount);
+        sleepCount++;
+        av_usleep(1000 * 10);
+    }
+
+    if (audio != NULL) {
+        audio->release();
+        delete (audio);
+        audio = NULL;
+    }
+
+    if (pFormatCtx != NULL) {
+        avformat_close_input(&pFormatCtx);
+        avformat_free_context(pFormatCtx);
+        pFormatCtx = NULL;
+    }
+
+    if (playState != NULL) {
+        playState = NULL;
+    }
+
+    if (callJava != NULL) {
+        callJava = NULL;
+    }
+
+    pthread_mutex_unlock(&init_mutex);
+
+}
+
+WlFFmpeg::~WlFFmpeg() {
+
 }

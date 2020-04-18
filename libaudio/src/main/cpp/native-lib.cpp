@@ -18,6 +18,7 @@ extern "C" {
 }
 
 
+WlPlayState *playState = NULL;
 
 
 extern "C"
@@ -234,7 +235,7 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
             callJava = new WlCallJava(jvm, env, &thiz);
         }
 
-        WlPlayState *playState = new WlPlayState();
+        playState = new WlPlayState();
         mFFmpeg = new WlFFmpeg(playState, callJava, source);
 
         mFFmpeg->prepare();
@@ -271,7 +272,7 @@ JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_pause(JNIEnv *env, jobject thiz) {
     // TODO: implement pause()
 
-    if(mFFmpeg!=NULL){
+    if (mFFmpeg != NULL) {
         mFFmpeg->pause();
     }
 }
@@ -280,10 +281,32 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_resume(JNIEnv *env, jobject thiz) {
     // TODO: implement resume()
-    if(mFFmpeg!=NULL){
+    if (mFFmpeg != NULL) {
         mFFmpeg->resume();
     }
 }
 
 
 //-----------------------音乐播放器------------------------------------
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
+    // TODO: implement nstop()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->release();
+        delete (mFFmpeg);
+        mFFmpeg = NULL;
+
+        if (callJava != NULL) {
+            delete (callJava);
+            callJava = NULL;
+        }
+
+        if (playState!=NULL){
+            delete (playState);
+            playState = NULL;
+        }
+    }
+
+
+}
