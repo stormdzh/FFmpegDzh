@@ -4,6 +4,9 @@
 
 #include "WlAudio.h"
 
-WlAudio::WlAudio() {
+WlAudio::WlAudio(WlPlayState *playState) {
+
+    this->playState=playState;
+    queue=new WlQueue(playState);
 
 }

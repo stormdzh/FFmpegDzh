@@ -221,7 +221,8 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
             callJava = new WlCallJava(jvm, env, &thiz);
         }
 
-        mFFmpeg = new WlFFmpeg(callJava, source);
+        WlPlayState *playState=new WlPlayState();
+        mFFmpeg = new WlFFmpeg(playState,callJava, source);
 
         mFFmpeg->prepare();
     }

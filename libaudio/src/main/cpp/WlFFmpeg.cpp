@@ -5,7 +5,8 @@
 
 #include "WlFFmpeg.h"
 
-WlFFmpeg::WlFFmpeg(WlCallJava *callJava, const char *url) {
+WlFFmpeg::WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url) {
+    this->playState = playState;
     this->callJava = callJava;
     this->url = url;
 }
@@ -34,6 +35,8 @@ void WlFFmpeg::decodeFFmpegThread() {
         char *string = av_err2str(code_open_input);
         LOGE("avformat_open_input 失败:%s", string);
         return;
+    } else {
+        LOGE("avformat_open_input 成功");
     }
 
     int code_find_stream_info = avformat_find_stream_info(pFormatCtx, NULL);
@@ -49,7 +52,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         //当前流是音频
         if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
-                audio = new WlAudio();
+                audio = new WlAudio(playState);
                 audio->streamIndex = i;
                 audio->codecpar = pParameters;
             }
@@ -110,6 +113,7 @@ void WlFFmpeg::start() {
             if (pPacket->stream_index == audio->streamIndex) {
                 LOGE("解码帧：%d", count);
 
+                audio->queue->putAvPacket(pPacket);
             } else {
                 av_packet_free(&pPacket);
                 av_free(pPacket);
@@ -121,5 +125,16 @@ void WlFFmpeg::start() {
         }
 
     }
+    //当上面的代码break，后测试从队列里面获取AVPacket
+    while (audio->queue->getQueueSize() > 0) {
+        AVPacket *pPacket = av_packet_alloc();
+        audio->queue->getAvPacket(pPacket);
+        av_packet_free(&pPacket);
+        av_free(pPacket);
+        pPacket = NULL;
+
+    }
+
+    LOGE("解码完成");
 
 }

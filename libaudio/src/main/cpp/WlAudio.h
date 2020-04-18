@@ -5,6 +5,9 @@
 #ifndef FFMPEGDZH_WLAUDIO_H
 #define FFMPEGDZH_WLAUDIO_H
 
+#include "WlQueue.h"
+#include "WlPlayState.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 };
@@ -16,9 +19,12 @@ public:
     AVCodecParameters *codecpar;
     AVCodecContext *avCodecContext;
 
+    WlQueue *queue = NULL;
+    WlPlayState *playState = NULL;
+
 public:
 
-    WlAudio();
+    WlAudio(WlPlayState *playState);
 
     ~WlAudio();
 };

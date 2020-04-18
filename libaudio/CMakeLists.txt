@@ -13,7 +13,10 @@ add_library( # Sets the name of the library.
         src/main/cpp/JavaListener.cpp
         src/main/cpp/WlAudio.cpp
         src/main/cpp/WlCallJava.cpp
-        src/main/cpp/WlFFmpeg.cpp)
+        src/main/cpp/WlFFmpeg.cpp
+        src/main/cpp/WlQueue.cpp
+        src/main/cpp/WlPlayState.cpp
+        )
 
 
 add_library(avcodec-58

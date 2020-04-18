@@ -21,13 +21,14 @@ class WlFFmpeg {
 public:
     int testnum = -1;
     WlCallJava *callJava = NULL;
-    const char* url = NULL;
+    const char *url = NULL;
     pthread_t decodeThread;
     AVFormatContext *pFormatCtx = NULL;
     WlAudio *audio = NULL;
+    WlPlayState *playState = NULL;
 public:
 
-    WlFFmpeg(WlCallJava *callJava, const char *url);
+    WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url);
 
     ~WlFFmpeg();
 
