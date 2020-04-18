@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Hello World!"
+        android:text="000000000!"
         android:textColor="#000000"
         android:textSize="16sp" />
 
@@ -31,6 +31,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:text="c++创建线程" />
 
     <Button
@@ -38,6 +40,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:text="c++停止线程" />
 
     <Button
@@ -45,6 +49,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:text="生产者和消费者" />
+
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="播放音频" />
 
 </LinearLayout>

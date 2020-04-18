@@ -9,6 +9,9 @@
 
 #include "pthread.h"
 
+#include "WlCallJava.h"
+#include "WlFFmpeg.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -198,3 +201,58 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 //-----------------------生产者结束------------------------------------
+
+
+//-----------------------音乐播放器------------------------------------
+
+WlFFmpeg *mFFmpeg = NULL;
+WlCallJava *callJava = NULL;
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstring _source) {
+    const char *source = env->GetStringUTFChars(_source, 0);
+
+    LOGE("播放地址：%s", source);
+
+    if (mFFmpeg == NULL) {
+
+        if (callJava == NULL) {
+            callJava = new WlCallJava(jvm, env, &thiz);
+        }
+
+        mFFmpeg = new WlFFmpeg(callJava, source);
+
+        mFFmpeg->prepare();
+    }
+
+
+//    env->ReleaseStringUTFChars(_source, source);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_start(JNIEnv *env, jobject thiz) {
+    LOGE("播放地址 start()");
+    if (mFFmpeg != NULL) {
+        mFFmpeg->start();
+    }
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_callbackFrom(JNIEnv *env, jobject instance) {
+
+    // TODO
+    javaListener = new JavaListener(jvm, env, env->NewGlobalRef(instance));
+    //javaListener->onError(1, 100, "c++ call java meid from main thread!");
+    pthread_create(&chidlThread, NULL, childCallback, javaListener);
+
+
+}
+
+
+
+
+//-----------------------音乐播放器------------------------------------
