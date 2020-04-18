@@ -43,6 +43,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnCoustom).setOnClickListener(this);
         findViewById(R.id.btnPlayPcm).setOnClickListener(this);
         findViewById(R.id.btnStart).setOnClickListener(this);
+        findViewById(R.id.btnPause).setOnClickListener(this);
+        findViewById(R.id.btnResume).setOnClickListener(this);
 
 
         mTestJni = new TestJni();
@@ -107,9 +109,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     return;
                 }
                 Log.i(TAG, "btnStart");
-//                mTestJni.setSource(mp3File.getAbsolutePath());
+                mTestJni.setSource(mp3File.getAbsolutePath());
 //                mTestJni.setSource("https://wp.zp68.com/sub/filestores/2016/07/20/2ad2953e033490cced7ab572564e84b5.mp3");
-                 mTestJni.setSource("http://stormful.oss-cn-shanghai.aliyuncs.com/0era/english/exam/10001_genuine.mp3?Expires=1587228202&OSSAccessKeyId=TMP.3KfDWMD2Es63VZdTpWymksHtsZNg8U4s4Zq2bbG9ym4fR43CpnpNwUe3bqZaXj9ueTFQUZU2ZLPM5D9dA8zZTqdNgUyrX6&Signature=WZpie2CP5fOHjIL6dwyV3Ar9lo8%3D");
+//                 mTestJni.setSource("http://stormful.oss-cn-shanghai.aliyuncs.com/0era/english/exam/10001_genuine.mp3?Expires=1587228202&OSSAccessKeyId=TMP.3KfDWMD2Es63VZdTpWymksHtsZNg8U4s4Zq2bbG9ym4fR43CpnpNwUe3bqZaXj9ueTFQUZU2ZLPM5D9dA8zZTqdNgUyrX6&Signature=WZpie2CP5fOHjIL6dwyV3Ar9lo8%3D");
                 //                mTestJni.testFFmpeg()
                 mTestJni.setPlayerPrepareListener(new PlayerPrepareListener() {
                     @Override
@@ -120,6 +122,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 });
                 mTestJni.mprepare();
 
+                break;
+            case R.id.btnPause:
+                mTestJni.pause();
+                break;
+            case R.id.btnResume:
+                mTestJni.resume();
                 break;
         }
     }

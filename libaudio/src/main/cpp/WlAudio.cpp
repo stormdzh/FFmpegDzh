@@ -275,3 +275,16 @@ int WlAudio::getCurrentSampleRateForOpensles(int sample_rate) {
     }
     return rate;
 }
+
+void WlAudio::pause() {
+    if (pcmPlayer == NULL)
+        return;
+    (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PAUSED);
+
+}
+
+void WlAudio::resume() {
+    if (pcmPlayer == NULL)
+        return;
+    (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PLAYING);
+}

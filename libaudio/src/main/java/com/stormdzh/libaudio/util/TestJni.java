@@ -111,6 +111,11 @@ public class TestJni {
         }
     }
 
+
+    public native void pause();
+
+    public native void resume();
+
     //-----------------------------------
 
 }

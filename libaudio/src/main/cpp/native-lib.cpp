@@ -266,7 +266,24 @@ Java_com_stormdzh_libaudio_util_TestJni_callbackFrom(JNIEnv *env, jobject instan
 
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_pause(JNIEnv *env, jobject thiz) {
+    // TODO: implement pause()
 
+    if(mFFmpeg!=NULL){
+        mFFmpeg->pause();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_resume(JNIEnv *env, jobject thiz) {
+    // TODO: implement resume()
+    if(mFFmpeg!=NULL){
+        mFFmpeg->resume();
+    }
+}
 
 
 //-----------------------音乐播放器------------------------------------

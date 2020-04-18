@@ -54,6 +54,10 @@ public:
     //    缓冲队列
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+
+    void pause();
+    void resume();
+
 public:
 
     WlAudio(WlPlayState *playState,int sample_rate,WlCallJava *callJava);

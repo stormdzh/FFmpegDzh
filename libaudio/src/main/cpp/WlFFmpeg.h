@@ -37,6 +37,10 @@ public:
     void decodeFFmpegThread();
 
     void start();
+
+
+    void pause();
+    void resume();
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H

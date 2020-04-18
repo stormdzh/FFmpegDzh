@@ -81,4 +81,13 @@
         android:focusableInTouchMode="true"
         android:text="暂停" />
 
+    <Button
+        android:id="@+id/btnResume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="播放" />
+
 </LinearLayout>

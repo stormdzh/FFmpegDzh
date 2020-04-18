@@ -52,7 +52,8 @@ void WlFFmpeg::decodeFFmpegThread() {
         //当前流是音频
         if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
-                audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,callJava);
+                audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,
+                                    callJava);
                 audio->streamIndex = i;
                 audio->codecpar = pParameters;
             }
@@ -148,4 +149,17 @@ void WlFFmpeg::start() {
 
     LOGE("解码完成");
 
+}
+
+void WlFFmpeg::pause() {
+    if (audio != NULL) {
+        audio->pause();
+    }
+
+}
+
+void WlFFmpeg::resume() {
+    if (audio != NULL) {
+        audio->resume();
+    }
 }
