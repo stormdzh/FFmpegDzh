@@ -22,7 +22,7 @@ void *decodePlay(void *data) {
     pthread_exit(&wlaudio->playThread);
 }
 
-FILE *outFile = fopen("/storage/emulated/0/resample.pcm", "w");
+//FILE *outFile = fopen("/storage/emulated/0/resample.pcm", "w");
 
 void WlAudio::play() {
 
@@ -107,7 +107,8 @@ int WlAudio::resampleAudio() {
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
             LOGE("解码数据 data size:%d", data_size);
 
-            fwrite(buffer, 1, data_size, outFile);
+
+//            fwrite(buffer, 1, data_size, outFile);
 
 
             av_packet_free(&avPacket);
