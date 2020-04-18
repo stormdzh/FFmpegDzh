@@ -56,6 +56,10 @@ void WlFFmpeg::decodeFFmpegThread() {
                                     callJava);
                 audio->streamIndex = i;
                 audio->codecpar = pParameters;
+                //设置总时长  pFormatCtx->duration的单位是微妙，转为秒
+                audio->duration = pFormatCtx->duration / AV_TIME_BASE;
+                //在当前流里面，没一帧的几分之几
+                audio->time_base = pFormatCtx->streams[i]->time_base;
             }
         }
 

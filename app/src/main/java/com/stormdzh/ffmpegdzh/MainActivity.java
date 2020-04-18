@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.stormdzh.libaudio.util.OnPlayEventListener;
 import com.stormdzh.libaudio.util.PlayerPrepareListener;
 import com.stormdzh.libaudio.util.TestJni;
 
@@ -24,6 +25,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private TextView tvTest;
     private TextView tvVersion;
+    private TextView tvProgress;
 
     private TestJni mTestJni;
 
@@ -37,6 +39,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         tvTest = findViewById(R.id.tvTest);
         tvVersion = findViewById(R.id.tvVersion);
+        tvProgress = findViewById(R.id.tvProgress);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
@@ -48,9 +51,44 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
         mTestJni = new TestJni();
+        tvTest.setText(mTestJni.stringFromJni());
+        tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.testFFmpeg());
 
-//        tvTest.setText(mTestJni.stringFromJni());
-//        tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.testFFmpeg());
+        mTestJni.setOnPlayEventListener(new OnPlayEventListener() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onProgress(final int curtime, final int duration) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        double per = ((double) curtime / (double) duration)*100;
+                        tvProgress.setText("当前播放进度:"+curtime+"/"+duration+"  百分比："+((int)per)+"%");
+                    }
+                });
+            }
+
+            @Override
+            public void onPuase() {
+
+            }
+
+            @Override
+            public void onStop() {
+
+            }
+
+            @Override
+            public void onDestry() {
+
+            }
+        });
+
+
     }
 
     private void requestPermissions() {

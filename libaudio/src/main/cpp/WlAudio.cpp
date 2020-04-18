@@ -123,7 +123,11 @@ int WlAudio::resampleAudio() {
 
 
 //            fwrite(buffer, 1, data_size, outFile);
-
+            now_time = avFrame->pts * av_q2d(time_base);
+            if (now_time < clock) {
+                now_time = clock;
+            }
+            clock = now_time;
 
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -160,6 +164,13 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     if (wlaudio != NULL) {
         int bufferSize = wlaudio->resampleAudio();
         if (bufferSize > 0) {
+            wlaudio->clock += bufferSize / ((double) (wlaudio->sample_rate * 2 * 2));
+            //回调进度
+            if (wlaudio->clock - wlaudio->last_time > 0.5) {
+                wlaudio->last_time = wlaudio->clock;
+                wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock, wlaudio->duration);
+            }
+
             (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->buffer,
                                                 bufferSize);
         }

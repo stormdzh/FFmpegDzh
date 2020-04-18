@@ -20,6 +20,7 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
 
     jmid_prepare = jniEnv->GetMethodID(jlz, "onCallPrepare", "()V");
     jmid_load = jniEnv->GetMethodID(jlz, "onCallLoad", "(Z)V");
+    jmid_timeinfo = jniEnv->GetMethodID(jlz, "onCallTimeInfo", "(II)V");
 }
 
 void WlCallJava::onCallPrepare(int type) {
@@ -42,7 +43,7 @@ void WlCallJava::onCallPrepare(int type) {
 void WlCallJava::onCallLoad(int type, bool load) {
     if (type == MAIN_THREAD) {
 
-        jniEnv->CallVoidMethod(jobj, jmid_load,load);
+        jniEnv->CallVoidMethod(jobj, jmid_load, load);
     } else if (type == CHILD_THREAD) {
 
         JNIEnv *jniEnv1;
@@ -50,7 +51,23 @@ void WlCallJava::onCallLoad(int type, bool load) {
             LOGI("WlCallJava  AttachCurrentThread 错误");
             return;
         }
-        jniEnv1->CallVoidMethod(jobj, jmid_load,load);
+        jniEnv1->CallVoidMethod(jobj, jmid_load, load);
+        javaVm->DetachCurrentThread();
+    }
+}
+
+void WlCallJava::onCallTimeInfo(int type, int curTime, int duration) {
+    if (type == MAIN_THREAD) {
+
+        jniEnv->CallVoidMethod(jobj, jmid_timeinfo, curTime, duration);
+    } else if (type == CHILD_THREAD) {
+
+        JNIEnv *jniEnv1;
+        if (javaVm->AttachCurrentThread(&jniEnv1, 0) != JNI_OK) {
+            LOGI("WlCallJava  AttachCurrentThread 错误");
+            return;
+        }
+        jniEnv1->CallVoidMethod(jobj, jmid_timeinfo, curTime, duration);
         javaVm->DetachCurrentThread();
     }
 }

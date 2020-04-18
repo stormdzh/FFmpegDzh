@@ -23,8 +23,9 @@ extern "C" {
 
 class WlAudio {
 public:
-    WlCallJava *callJava=NULL;
-
+    //回调到java
+    WlCallJava *callJava = NULL;
+//    音频流索引
     int streamIndex = -1;
     AVCodecParameters *codecpar;
     AVCodecContext *avCodecContext;
@@ -39,7 +40,7 @@ public:
     uint8_t *buffer = NULL;
 
     int data_size = 0;
-
+    //采样率
     int sample_rate = 0;
 
     //    引擎
@@ -54,13 +55,21 @@ public:
     //    缓冲队列
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+    //音频总时长
+    int duration = 0;
+    //分值
+    AVRational time_base;
+    //当前时间
+    double now_time = 0;
 
-    void pause();
-    void resume();
+    double clock=0;
+
+    int last_time=0;
+
 
 public:
 
-    WlAudio(WlPlayState *playState,int sample_rate,WlCallJava *callJava);
+    WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava);
 
     ~WlAudio();
 
@@ -71,6 +80,10 @@ public:
     void initOpenSLES();
 
     int getCurrentSampleRateForOpensles(int sample_rate);
+
+    void pause();
+
+    void resume();
 };
 
 #endif //FFMPEGDZH_WLAUDIO_H

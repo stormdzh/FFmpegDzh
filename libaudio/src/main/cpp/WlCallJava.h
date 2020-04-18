@@ -20,6 +20,7 @@ public:
     jobject jobj;
     jmethodID jmid_prepare;
     jmethodID jmid_load;
+    jmethodID jmid_timeinfo;
 
 public:
     WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *jobj);
@@ -29,6 +30,9 @@ public:
     void onCallPrepare(int type);
 
     void onCallLoad(int type, bool load);
+
+    void onCallTimeInfo(int type, int curTime,int duration);
+
 
 };
 

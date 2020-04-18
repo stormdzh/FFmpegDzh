@@ -58,9 +58,14 @@ public class TestJni {
     //------------------------------------
 
     private PlayerPrepareListener mPlayerPrepareListener;
+    private OnPlayEventListener mOnPlayEventListener;
 
     public void setPlayerPrepareListener(PlayerPrepareListener playerPrepareListener) {
         this.mPlayerPrepareListener = playerPrepareListener;
+    }
+
+    public void setOnPlayEventListener(OnPlayEventListener playEventListener) {
+        this.mOnPlayEventListener = playEventListener;
     }
 
     public void mprepare() {
@@ -68,14 +73,14 @@ public class TestJni {
         if (TextUtils.isEmpty(mSource)) {
             Log.i(TAG, "播放地址为空");
             return;
-        }else{
+        } else {
             Log.i(TAG, "可以播放");
         }
         onCallLoad(true);
         prepare(mSource);
     }
 
-    public void mStart(){
+    public void mStart() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -102,11 +107,11 @@ public class TestJni {
     public native void start();
 
 
-    public void onCallLoad(boolean load){
-        Log.i(TAG, "onCallLoad load:"+load);
-        if(load){
+    public void onCallLoad(boolean load) {
+        Log.i(TAG, "onCallLoad load:" + load);
+        if (load) {
             Log.i(TAG, "加载中。。。。。。。");
-        }else{
+        } else {
             Log.i(TAG, "播放中。。。。。。。");
         }
     }
@@ -115,6 +120,14 @@ public class TestJni {
     public native void pause();
 
     public native void resume();
+
+    //c++ 回调音频进度
+    public void onCallTimeInfo(int curtime, int duration) {
+        Log.i(TAG, "onCallTimeInfo duration:" + duration + " curtime:" + curtime);
+        if (mOnPlayEventListener != null) {
+            mOnPlayEventListener.onProgress(curtime, duration);
+        }
+    }
 
     //-----------------------------------
 
