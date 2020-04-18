@@ -52,6 +52,9 @@ public class TestJni {
     public native void callbackFromC();
 
 
+    public native void playPcm(String pcmPath);
+
+
     //------------------------------------
 
     private PlayerPrepareListener mPlayerPrepareListener;

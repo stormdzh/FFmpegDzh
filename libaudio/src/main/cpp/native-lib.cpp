@@ -203,6 +203,19 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 //-----------------------生产者结束------------------------------------
 
 
+#include "TestSLES.h"
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_playPcm(JNIEnv *env, jobject thiz, jstring _pcmpath) {
+    // TODO: implement playPcm()
+    const char *source = env->GetStringUTFChars(_pcmpath, 0);
+    LOGE("播放pcm地址：%s", source);
+
+    TestSLES *testSles = new TestSLES(source);
+}
+
+
 //-----------------------音乐播放器------------------------------------
 
 WlFFmpeg *mFFmpeg = NULL;
@@ -221,8 +234,8 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
             callJava = new WlCallJava(jvm, env, &thiz);
         }
 
-        WlPlayState *playState=new WlPlayState();
-        mFFmpeg = new WlFFmpeg(playState,callJava, source);
+        WlPlayState *playState = new WlPlayState();
+        mFFmpeg = new WlFFmpeg(playState, callJava, source);
 
         mFFmpeg->prepare();
     }

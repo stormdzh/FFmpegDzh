@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
         findViewById(R.id.btnCoustom).setOnClickListener(this);
+        findViewById(R.id.btnPlayPcm).setOnClickListener(this);
         findViewById(R.id.btnStart).setOnClickListener(this);
 
 
@@ -89,6 +90,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         Log.i("MFFMPEG", "code:" + code + "  msg:" + msg);
                     }
                 });
+                break;
+                //播放pcm
+            case R.id.btnPlayPcm:
+                File pcmFile = new File(Environment.getExternalStorageDirectory(), "mydream.pcm");
+                mTestJni.playPcm(pcmFile.getAbsolutePath());
                 break;
             case R.id.btnStart:
 //                File mp3File = new File(Environment.getExternalStorageDirectory(), "3_test.wav");

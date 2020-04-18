@@ -16,6 +16,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/WlFFmpeg.cpp
         src/main/cpp/WlQueue.cpp
         src/main/cpp/WlPlayState.cpp
+        src/main/cpp/TestSLES.cpp
         )
 
 
@@ -76,5 +77,6 @@ target_link_libraries(
         # 链接 android ndk 自带的一些库
         android
         log
+        OpenSLES
         ${log-lib}  ${android-lib}
 )
