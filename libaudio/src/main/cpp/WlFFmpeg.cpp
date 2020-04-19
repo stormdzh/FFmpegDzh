@@ -290,7 +290,7 @@ void WlFFmpeg::seek(int64_t secds) {
 
             pthread_mutex_lock(&seek_mutex);
             int64_t rel = secds * AV_TIME_BASE;
-            avformat_seek_file(pFormatCtx, -1, INT16_MIN, rel, INT16_MAX, 0);
+            avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT64_MAX, 0);
             pthread_mutex_unlock(&seek_mutex);
             playState->isSeeking = false;
         }

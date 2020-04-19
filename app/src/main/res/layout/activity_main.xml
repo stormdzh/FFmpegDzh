@@ -209,7 +209,7 @@
             android:layout_weight="1"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="变调1。5" />
+            android:text="变调1.5" />
 
         <Button
             android:id="@+id/btnTempo1"
