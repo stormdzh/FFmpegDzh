@@ -349,3 +349,21 @@ Java_com_stormdzh_libaudio_util_TestJni_setMute(JNIEnv *env, jobject thiz, jint 
         mFFmpeg->setMute(type);
     }
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_setPitch(JNIEnv *env, jobject thiz, jdouble new_pitch) {
+    // TODO: implement setPitch()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->audio->setPitch(new_pitch);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_setTempo(JNIEnv *env, jobject thiz, jdouble new_tempo) {
+    // TODO: implement setTempo()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->audio->setTempo(new_tempo);
+    }
+}

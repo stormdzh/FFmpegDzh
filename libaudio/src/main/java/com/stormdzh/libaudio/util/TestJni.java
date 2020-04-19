@@ -177,6 +177,10 @@ public class TestJni {
 
     public native void setMute(int type);
 
+    public native void setPitch(double newPitch);
+
+    public native void setTempo(double newTempo);
+
     //-----------------------------------
 
 }

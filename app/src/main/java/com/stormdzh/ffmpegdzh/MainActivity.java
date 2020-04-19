@@ -58,6 +58,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnLeft).setOnClickListener(this);
         findViewById(R.id.btnRight).setOnClickListener(this);
         findViewById(R.id.btnLeftRight).setOnClickListener(this);
+
+        findViewById(R.id.btnPitch1).setOnClickListener(this);
+        findViewById(R.id.btnPitch15).setOnClickListener(this);
+        findViewById(R.id.btnTempo1).setOnClickListener(this);
+        findViewById(R.id.btnTempo2).setOnClickListener(this);
+
+
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean isfromUser) {
@@ -77,7 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 int progress = seekBar.getProgress();
                 if (mTestJni != null) {
                     int seekto = (int) (mduration * ((double) progress / 100));
-                    Log.i(TAG,"seek 时间："+seekto);
+                    Log.i(TAG, "seek 时间：" + seekto);
                     mTestJni.seekto(seekto);
                 }
             }
@@ -86,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                Log.i(TAG,"seek 音量："+progress);
+                Log.i(TAG, "seek 音量：" + progress);
                 mTestJni.setVolume(progress);
             }
 
@@ -240,6 +247,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnLeftRight:
                 mTestJni.volumeLeftRight();
+                break;
+            case R.id.btnPitch1:
+                mTestJni.setPitch(1);
+                break;
+            case R.id.btnPitch15:
+                mTestJni.setPitch(1.5);
+                break;
+            case R.id.btnTempo1:
+                mTestJni.setTempo(1);
+                break;
+            case R.id.btnTempo2:
+                mTestJni.setTempo(2);
                 break;
         }
     }

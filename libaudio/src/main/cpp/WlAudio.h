@@ -12,6 +12,9 @@
 
 #include "WlCallJava.h"
 
+#include "SoundTouch.h"
+using namespace soundtouch;
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswresample/swresample.h>
@@ -42,6 +45,8 @@ public:
     int data_size = 0;
     //采样率
     int sample_rate = 0;
+    //采样个数
+    int nb=0;
 
     //    引擎
     SLObjectItf engineObject = NULL;
@@ -75,6 +80,14 @@ public:
     int defaultVolume=100;
 
 
+    //soundTouch
+    SoundTouch *soundTouch=NULL;
+    SAMPLETYPE *sampleBuffer=NULL;
+    bool finished=true;
+    uint8_t *out_buffer =NULL;
+    int sound_touch_nb=0; //soundtouch返回的采样个数
+
+
 public:
 
     WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava);
@@ -83,7 +96,7 @@ public:
 
     void play();
 
-    int resampleAudio();
+    int resampleAudio(void **pcmBuf);
 
     void initOpenSLES();
 
@@ -101,6 +114,14 @@ public:
 
      //0:右声道 1：左声道  2：立体声
     void setMute(int type);
+
+
+    //sountouch
+    int getSoundTouchData();
+    //变调
+    void setPitch(double newPitch);
+    //变速
+    void setTempo(double newTempo);
 
 
 };

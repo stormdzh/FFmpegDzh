@@ -10,7 +10,17 @@ WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) 
     this->sample_rate = sample_rate;
     this->playState = playState;
     queue = new WlQueue(playState);
-    buffer = static_cast<uint8_t *>(malloc(44100 * 2 * 2));
+    buffer = static_cast<uint8_t *>(malloc(sample_rate * 2 * 2));
+
+    //soundtouch
+    sampleBuffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2));
+    soundTouch = new SoundTouch();
+    soundTouch->setSampleRate(sample_rate);
+    soundTouch->setChannels(2);
+    //设置变速
+    soundTouch->setPitch(1.0f);
+    //设置变调
+    soundTouch->setTempo(1.0f);
 
 }
 
@@ -31,7 +41,8 @@ void WlAudio::play() {
 
 }
 
-int WlAudio::resampleAudio() {
+//**pcmBuf 参数也是为了soundtouch加的
+int WlAudio::resampleAudio(void **pcmBuf) {
 
     while (playState != NULL && !playState->exit) {
 
@@ -109,7 +120,7 @@ int WlAudio::resampleAudio() {
 
             }
 
-            int nb = swr_convert(
+            nb = swr_convert(
                     swrContext,
                     &buffer,
                     avFrame->nb_samples,
@@ -128,6 +139,9 @@ int WlAudio::resampleAudio() {
                 now_time = clock;
             }
             clock = now_time;
+
+            //Soundtouch 变速使用
+            *pcmBuf = buffer;
 
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -158,11 +172,48 @@ int WlAudio::resampleAudio() {
     return data_size;
 }
 
+
+int WlAudio::getSoundTouchData() {
+
+    while (playState != NULL && !playState->exit) {
+        out_buffer = NULL;
+        if (finished) {
+            finished = false;
+            data_size = resampleAudio(reinterpret_cast<void **>(&out_buffer));
+            if (data_size > 0) {
+                for (int i = 0; i < data_size / 2 + 1; i++) {
+                    sampleBuffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                }
+                soundTouch->putSamples(sampleBuffer, nb);
+                sound_touch_nb = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+            } else {
+                soundTouch->flush();
+            }
+        }
+        if (sound_touch_nb == 0) {
+            finished = true;
+            continue;
+        } else {
+            if (out_buffer == NULL) {
+                sound_touch_nb = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+                if (sound_touch_nb == 0) {
+                    finished = true;
+                    continue;
+                }
+            }
+            return sound_touch_nb;
+        }
+    }
+    return 0;
+}
+
+
 void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
 
     WlAudio *wlaudio = static_cast<WlAudio *>(context);
     if (wlaudio != NULL) {
-        int bufferSize = wlaudio->resampleAudio();
+//        int bufferSize = wlaudio->resampleAudio();
+        int bufferSize = wlaudio->getSoundTouchData();
         if (bufferSize > 0) {
             wlaudio->clock += bufferSize / ((double) (wlaudio->sample_rate * 2 * 2));
             //回调进度
@@ -171,8 +222,9 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock, wlaudio->duration);
             }
 
-            (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->buffer,
-                                                bufferSize);
+//            (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->buffer,bufferSize);
+            (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->sampleBuffer,
+                                                bufferSize * 2 * 2);
         }
     }
 }
@@ -218,8 +270,8 @@ void WlAudio::initOpenSLES() {
 //    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
 //    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
 //    使用控制音量需要修改为
-    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME,SL_IID_MUTESOLO};
-    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
 //    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
 //    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
@@ -376,42 +428,26 @@ WlAudio::~WlAudio() {
 }
 
 void WlAudio::setVolume(int percent) {
-    defaultVolume=percent;
+    defaultVolume = percent;
     if (pcmVolumePlay != NULL) {
 //        (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -50);
-        if(percent > 30)
-        {
+        if (percent > 30) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -20);
-        }
-        else if(percent > 25)
-        {
+        } else if (percent > 25) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -22);
-        }
-        else if(percent > 20)
-        {
+        } else if (percent > 20) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -25);
-        }
-        else if(percent > 15)
-        {
+        } else if (percent > 15) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -28);
-        }
-        else if(percent > 10)
-        {
+        } else if (percent > 10) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -30);
-        }
-        else if(percent > 5)
-        {
+        } else if (percent > 5) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -34);
-        }
-        else if(percent > 3)
-        {
+        } else if (percent > 3) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -37);
-        }
-        else if(percent > 0)
-        {
+        } else if (percent > 0) {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -40);
-        }
-        else{
+        } else {
             (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -100);
         }
     }
@@ -419,16 +455,29 @@ void WlAudio::setVolume(int percent) {
 }
 
 void WlAudio::setMute(int type) {
-    if(pcmMuteSoloPlay==NULL) return;
-    if(type==0){ //左声道
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,1, false);
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,0, true);
-    }else if(type==1){//右声道
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,1, true);
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,0, false);
-    }else if(type==2){//立体声
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,1, false);
-        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay,0, false);
+    if (pcmMuteSoloPlay == NULL) return;
+    if (type == 0) { //左声道
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 1, false);
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 0, true);
+    } else if (type == 1) {//右声道
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 1, true);
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 0, false);
+    } else if (type == 2) {//立体声
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 1, false);
+        (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 0, false);
     }
 
+}
+
+void WlAudio::setPitch(double newPitch) {
+    if (soundTouch != NULL) {
+        soundTouch->setPitch(newPitch);
+    }
+
+}
+
+void WlAudio::setTempo(double newTempo) {
+    if (soundTouch != NULL) {
+        soundTouch->setTempo(newTempo);
+    }
 }
