@@ -21,6 +21,7 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
     jmid_prepare = jniEnv->GetMethodID(jlz, "onCallPrepare", "()V");
     jmid_load = jniEnv->GetMethodID(jlz, "onCallLoad", "(Z)V");
     jmid_timeinfo = jniEnv->GetMethodID(jlz, "onCallTimeInfo", "(II)V");
+    jmid_error = jniEnv->GetMethodID(jlz, "onCallError", "(ILjava/lang/String;)V");
 }
 
 void WlCallJava::onCallPrepare(int type) {
@@ -74,5 +75,25 @@ void WlCallJava::onCallTimeInfo(int type, int curTime, int duration) {
 
 WlCallJava::~WlCallJava() {
 
+}
+
+void WlCallJava::onCallError(int type, int code, char *msg) {
+
+    if (type == MAIN_THREAD) {
+        jstring jmsg = jniEnv->NewStringUTF(msg);
+        jniEnv->CallVoidMethod(jobj, jmid_error, code, jmsg);
+        jniEnv->DeleteLocalRef(jmsg);
+    } else if (type == CHILD_THREAD) {
+
+        JNIEnv *jniEnv1;
+        if (javaVm->AttachCurrentThread(&jniEnv1, 0) != JNI_OK) {
+            LOGI("WlCallJava  AttachCurrentThread 错误");
+            return;
+        }
+        jstring jmsg = jniEnv1->NewStringUTF(msg);
+        jniEnv1->CallVoidMethod(jobj, jmid_error, code, jmsg);
+        jniEnv1->DeleteLocalRef(jmsg);
+        javaVm->DetachCurrentThread();
+    }
 }
 

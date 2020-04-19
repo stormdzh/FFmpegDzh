@@ -76,7 +76,7 @@ public class TestJni {
         } else {
             Log.i(TAG, "可以播放");
         }
-        onCallLoad(true);
+//        onCallLoad(true);
         prepare(mSource);
     }
 
@@ -126,6 +126,16 @@ public class TestJni {
         Log.i(TAG, "onCallTimeInfo duration:" + duration + " curtime:" + curtime);
         if (mOnPlayEventListener != null) {
             mOnPlayEventListener.onProgress(curtime, duration);
+        }
+    }
+
+    //c++ 错误 回调
+    public void onCallError(int code, String msg) {
+        //错误停止视频，释放资源
+        onCallLoad(false);
+        nstop();
+        if (mOnPlayEventListener != null) {
+            mOnPlayEventListener.onError(code, msg);
         }
     }
 

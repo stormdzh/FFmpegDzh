@@ -17,4 +17,6 @@ public interface OnPlayEventListener {
 
     void onDestry();
 
+    void onError(int code, String msg);
+
 }
