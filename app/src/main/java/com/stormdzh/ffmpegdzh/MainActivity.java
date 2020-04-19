@@ -60,6 +60,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (isfromUser) {
                     if (mTestJni != null) {
                         int seekto = (int) (mduration * ((double) progress / 100));
+                        seekto=230;
+                        Log.i(TAG,"seek 时间："+seekto);
                         mTestJni.seekto(seekto);
                     }
                 }

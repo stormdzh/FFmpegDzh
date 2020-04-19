@@ -139,6 +139,15 @@ public class TestJni {
         }
     }
 
+    //c++ 错误 回调
+    public void onCallComplete() {
+        //错误停止视频，释放资源
+        nstop();
+        if (mOnPlayEventListener != null) {
+            mOnPlayEventListener.onComplete();
+        }
+    }
+
     public void stop() {
         nstop();
     }

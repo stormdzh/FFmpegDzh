@@ -206,7 +206,11 @@ void WlFFmpeg::start() {
 //
 //    }
 
+    if(callJava!=NULL){
+        callJava->onCallComplete(CHILD_THREAD);
+    }
     initexit = true;
+
     LOGE("解码完成");
 
 }

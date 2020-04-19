@@ -21,7 +21,6 @@ extern "C" {
 WlPlayState *playState = NULL;
 bool nativeExit = true;
 
-
 extern "C"
 JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_stringFromJni(JNIEnv *env,
                                                                                 jobject) {
@@ -223,6 +222,8 @@ Java_com_stormdzh_libaudio_util_TestJni_playPcm(JNIEnv *env, jobject thiz, jstri
 WlFFmpeg *mFFmpeg = NULL;
 WlCallJava *callJava = NULL;
 
+pthread_t thread_start = NULL;
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstring _source) {
@@ -247,26 +248,23 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
 //    env->ReleaseStringUTFChars(_source, source);
 }
 
+
+void *startCallback(void *data) {
+    WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
+    if (fFmpeg != NULL) {
+        fFmpeg->start();
+    }
+    pthread_exit(&thread_start);
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_start(JNIEnv *env, jobject thiz) {
     LOGE("播放地址 start()");
     if (mFFmpeg != NULL) {
-        mFFmpeg->start();
+        pthread_create(&thread_start, NULL, startCallback, mFFmpeg);
+//        mFFmpeg->start();
     }
-}
-
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_callbackFrom(JNIEnv *env, jobject instance) {
-
-    // TODO
-    javaListener = new JavaListener(jvm, env, env->NewGlobalRef(instance));
-    //javaListener->onError(1, 100, "c++ call java meid from main thread!");
-    pthread_create(&chidlThread, NULL, childCallback, javaListener);
-
-
 }
 
 extern "C"

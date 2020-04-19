@@ -110,6 +110,7 @@
         android:text="停止" />
 
     <SeekBar
+        android:max="100"
         android:id="@+id/mSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
