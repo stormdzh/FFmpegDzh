@@ -330,3 +330,13 @@ Java_com_stormdzh_libaudio_util_TestJni_setVolume(JNIEnv *env, jobject thiz, jin
 }
 
 //-----------------------音乐播放器------------------------------------
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_getVolume(JNIEnv *env, jobject thiz) {
+    // TODO: implement getVolume()
+    int volume = 100;
+    if (mFFmpeg != NULL) {
+        mFFmpeg->audio->defaultVolume;
+    }
+    return volume;
+}

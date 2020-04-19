@@ -238,6 +238,10 @@ void WlAudio::initOpenSLES() {
     //-------------------------------------------
     //设置缓冲
     (*pcmPlayerObj)->GetInterface(pcmPlayerObj, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
+
+    //如果有需求可以，在这是默认音量
+    setVolume(defaultVolume);
+
     (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, mPcmBufferCallBack, this);
     (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PLAYING);
 
@@ -370,7 +374,7 @@ WlAudio::~WlAudio() {
 }
 
 void WlAudio::setVolume(int percent) {
-
+    defaultVolume=percent;
     if (pcmVolumePlay != NULL) {
 //        (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -50);
         if(percent > 30)

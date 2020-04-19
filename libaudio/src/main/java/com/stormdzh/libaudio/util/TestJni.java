@@ -157,8 +157,10 @@ public class TestJni {
     //seek到秒
     public native void seekto(int msc);
 
-
+    //需要在prepare后才能设置
     public native void setVolume(int percent);
+
+    public native int getVolume();
 
     //-----------------------------------
 

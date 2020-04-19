@@ -69,6 +69,9 @@ public:
 
     int last_time=0;
 
+    //默认音量
+    int defaultVolume=100;
+
 
 public:
 
