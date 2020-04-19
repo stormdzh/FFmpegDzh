@@ -366,4 +366,13 @@ Java_com_stormdzh_libaudio_util_TestJni_setTempo(JNIEnv *env, jobject thiz, jdou
     if (mFFmpeg != NULL) {
         mFFmpeg->audio->setTempo(new_tempo);
     }
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_getSampleRate(JNIEnv *env, jobject thiz) {
+    // TODO: implement getSampleRate()
+    int sampleRate = 0;
+    if (mFFmpeg != NULL) {
+        sampleRate = mFFmpeg->audio->avCodecContext->sample_rate;
+    }
+    return sampleRate;
 }

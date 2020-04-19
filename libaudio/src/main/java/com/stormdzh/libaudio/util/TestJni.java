@@ -3,6 +3,8 @@ package com.stormdzh.libaudio.util;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.File;
+
 /**
  * @Description: 描述
  * @Author: dzh
@@ -181,6 +183,34 @@ public class TestJni {
 
     public native void setTempo(double newTempo);
 
+
+    public native int getSampleRate();
+
     //-----------------------------------
+
+    MediaCodecUtil mMediaCodecUtil = null;
+
+    boolean isMediaCodecSuc = false;
+
+    public void startRecord(File outFile) {
+        if (mMediaCodecUtil == null) {
+            mMediaCodecUtil = new MediaCodecUtil();
+        }
+        Log.i("DDD", "encodecPcmToAAc  getSampleRate:" + getSampleRate());
+        if (getSampleRate() > 0) {
+            isMediaCodecSuc = mMediaCodecUtil.initMediacodec(getSampleRate(), outFile);
+        }
+        Log.i("DDD", "encodecPcmToAAc  isMediaCodecSuc:" + isMediaCodecSuc);
+    }
+
+    //C++回调的方法
+    private void encodecPcmToAAc(final int size, final byte[] buffer) {
+//        Log.i("DDD","encodecPcmToAAc  size:"+size);
+        if (mMediaCodecUtil != null && isMediaCodecSuc) {
+            mMediaCodecUtil.encodecPcmToAAc(size, buffer);
+
+        }
+    }
+
 
 }

@@ -221,7 +221,10 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 wlaudio->last_time = wlaudio->clock;
                 wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock, wlaudio->duration);
             }
-            
+
+            //调用java硬编码吧pcm转为aac
+            wlaudio->callJava->onCallPcmToAAc(CHILD_THREAD, bufferSize * 2 * 2, wlaudio->sampleBuffer);
+
              //获取音频数据的振幅
             int db = wlaudio->getPCMDB(reinterpret_cast<char *>(wlaudio->sampleBuffer), bufferSize * 2 * 2);
             LOGE("--------pcm数据的振幅：----》%d",db);

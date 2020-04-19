@@ -23,6 +23,7 @@ public:
     jmethodID jmid_timeinfo;
     jmethodID jmid_error;
     jmethodID jmid_complete;
+    jmethodID jmid_pcmtoaac;
 
 public:
     WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *jobj);
@@ -38,6 +39,8 @@ public:
     void onCallError(int type, int code,char *msg);
 
     void onCallComplete(int type);
+
+    void onCallPcmToAAc(int type,int size,void *buffer);
 
 
 };

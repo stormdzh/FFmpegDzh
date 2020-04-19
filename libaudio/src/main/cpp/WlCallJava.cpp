@@ -23,6 +23,7 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
     jmid_timeinfo = jniEnv->GetMethodID(jlz, "onCallTimeInfo", "(II)V");
     jmid_error = jniEnv->GetMethodID(jlz, "onCallError", "(ILjava/lang/String;)V");
     jmid_complete = jniEnv->GetMethodID(jlz, "onCallComplete", "()V");
+    jmid_pcmtoaac = jniEnv->GetMethodID(jlz, "encodecPcmToAAc", "(I[B)V");
 }
 
 void WlCallJava::onCallPrepare(int type) {
@@ -110,6 +111,37 @@ void WlCallJava::onCallComplete(int type) {
             return;
         }
         jniEnv1->CallVoidMethod(jobj, jmid_complete);
+        javaVm->DetachCurrentThread();
+    }
+}
+
+void WlCallJava::onCallPcmToAAc(int type, int size, void *buffer) {
+
+    if(type == MAIN_THREAD)
+    {
+        jbyteArray jbuffer = jniEnv->NewByteArray(size);
+        jniEnv->SetByteArrayRegion(jbuffer, 0, size, static_cast<const jbyte *>(buffer));
+
+        jniEnv->CallVoidMethod(jobj, jmid_pcmtoaac, size, jbuffer);
+
+        jniEnv->DeleteLocalRef(jbuffer);
+
+    }
+    else if(type == CHILD_THREAD)
+    {
+        JNIEnv *jniEnv;
+        if(javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK)
+        {
+                LOGE("call onCallComplete worng");
+            return;
+        }
+        jbyteArray jbuffer = jniEnv->NewByteArray(size);
+        jniEnv->SetByteArrayRegion(jbuffer, 0, size, static_cast<const jbyte *>(buffer));
+
+        jniEnv->CallVoidMethod(jobj, jmid_pcmtoaac, size, jbuffer);
+
+        jniEnv->DeleteLocalRef(jbuffer);
+
         javaVm->DetachCurrentThread();
     }
 }

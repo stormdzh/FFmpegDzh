@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnPitch15).setOnClickListener(this);
         findViewById(R.id.btnTempo1).setOnClickListener(this);
         findViewById(R.id.btnTempo2).setOnClickListener(this);
+        findViewById(R.id.btnStartRecord).setOnClickListener(this);
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -259,6 +260,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnTempo2:
                 mTestJni.setTempo(2);
+                break;
+            case R.id.btnStartRecord:
+                File outFile = new File(Environment.getExternalStorageDirectory(), "pcmToAac.aac");
+                mTestJni.startRecord(outFile);
                 break;
         }
     }
