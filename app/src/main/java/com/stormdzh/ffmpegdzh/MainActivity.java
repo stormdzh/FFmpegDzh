@@ -55,6 +55,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnPause).setOnClickListener(this);
         findViewById(R.id.btnResume).setOnClickListener(this);
         findViewById(R.id.btnStop).setOnClickListener(this);
+        findViewById(R.id.btnLeft).setOnClickListener(this);
+        findViewById(R.id.btnRight).setOnClickListener(this);
+        findViewById(R.id.btnLeftRight).setOnClickListener(this);
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean isfromUser) {
@@ -228,6 +231,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnStop:
                 mTestJni.stop();
+                break;
+            case R.id.btnLeft:
+                mTestJni.volumeLeft();
+                break;
+            case R.id.btnRight:
+                mTestJni.volumeRight();
+                break;
+            case R.id.btnLeftRight:
+                mTestJni.volumeLeftRight();
                 break;
         }
     }

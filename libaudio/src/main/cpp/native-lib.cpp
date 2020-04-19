@@ -340,3 +340,12 @@ Java_com_stormdzh_libaudio_util_TestJni_getVolume(JNIEnv *env, jobject thiz) {
     }
     return volume;
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_setMute(JNIEnv *env, jobject thiz, jint type) {
+    // TODO: implement setMute()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->setMute(type);
+    }
+}

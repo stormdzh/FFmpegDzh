@@ -162,7 +162,7 @@ void WlFFmpeg::start() {
             continue;
         }
         //控制缓存队列最多缓存40帧
-        if(audio->queue->getQueueSize()>40){
+        if (audio->queue->getQueueSize() > 40) {
             continue;
         }
 
@@ -206,7 +206,7 @@ void WlFFmpeg::start() {
 //
 //    }
 
-    if(callJava!=NULL){
+    if (callJava != NULL) {
         callJava->onCallComplete(CHILD_THREAD);
     }
     initexit = true;
@@ -299,7 +299,14 @@ void WlFFmpeg::seek(int64_t secds) {
 
 void WlFFmpeg::setVolume(int percent) {
 
-    if(audio!=NULL){
+    if (audio != NULL) {
         audio->setVolume(percent);
     }
+}
+
+void WlFFmpeg::setMute(int type) {
+    if (audio != NULL) {
+        audio->setMute(type);
+    }
+
 }

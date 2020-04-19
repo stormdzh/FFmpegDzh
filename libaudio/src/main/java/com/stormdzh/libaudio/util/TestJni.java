@@ -162,6 +162,21 @@ public class TestJni {
 
     public native int getVolume();
 
+
+    public void volumeLeft() {
+        setMute(1);
+    }
+
+    public void volumeRight() {
+        setMute(0);
+    }
+
+    public void volumeLeftRight() {
+        setMute(2);
+    }
+
+    public native void setMute(int type);
+
     //-----------------------------------
 
 }

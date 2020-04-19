@@ -57,6 +57,8 @@ public:
 
     //音量控制
     SLVolumeItf pcmVolumePlay=NULL;
+    //声道控制
+    SLMuteSoloItf pcmMuteSoloPlay =NULL;
 
     //音频总时长
     int duration = 0;
@@ -96,6 +98,11 @@ public:
     void release();
 
     void setVolume(int percent);
+
+     //0:右声道 1：左声道  2：立体声
+    void setMute(int type);
+
+
 };
 
 #endif //FFMPEGDZH_WLAUDIO_H
