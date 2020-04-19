@@ -19,17 +19,21 @@ extern "C"
 
 class WlFFmpeg {
 public:
-    int testnum = -1;
     WlCallJava *callJava = NULL;
     const char *url = NULL;
     pthread_t decodeThread;
     AVFormatContext *pFormatCtx = NULL;
     WlAudio *audio = NULL;
     WlPlayState *playState = NULL;
-
+    //初始化的锁
     pthread_mutex_t init_mutex;
+    //seek的锁
+    pthread_mutex_t seek_mutex;
 
-    bool initexit=false;
+    bool initexit = false;
+
+    int duration = 0;
+
 public:
 
     WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url);
@@ -48,6 +52,9 @@ public:
     void resume();
 
     void release();
+
+    //seek 单位是秒
+    void seek(int64_t secds);
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H

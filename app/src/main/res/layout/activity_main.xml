@@ -109,4 +109,9 @@
         android:focusableInTouchMode="true"
         android:text="停止" />
 
+    <SeekBar
+        android:id="@+id/mSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

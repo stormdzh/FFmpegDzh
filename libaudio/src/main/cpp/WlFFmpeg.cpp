@@ -9,6 +9,7 @@ WlFFmpeg::WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url
     this->callJava = callJava;
     this->url = url;
     pthread_mutex_init(&init_mutex, NULL);
+    pthread_mutex_init(&seek_mutex, NULL);
 }
 
 void *decodeFFmpeg(void *data) {
@@ -55,7 +56,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("avformat_open_input 失败:%s", string);
         pthread_mutex_unlock(&init_mutex);
         initexit = true;
-        callJava->onCallError(CHILD_THREAD,10001,av_err2str(code_open_input));
+        callJava->onCallError(CHILD_THREAD, 10001, av_err2str(code_open_input));
         return;
     } else {
         LOGE("avformat_open_input 成功");
@@ -66,7 +67,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("code_find_stream_info 失败");
         initexit = true;
         pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD,10002,av_err2str(code_find_stream_info));
+        callJava->onCallError(CHILD_THREAD, 10002, av_err2str(code_find_stream_info));
         return;
     } else {
         LOGE("code_find_stream_info 成功");
@@ -85,6 +86,8 @@ void WlFFmpeg::decodeFFmpegThread() {
                 audio->duration = pFormatCtx->duration / AV_TIME_BASE;
                 //在当前流里面，没一帧的几分之几
                 audio->time_base = pFormatCtx->streams[i]->time_base;
+                //当前类中记录音频长度
+                duration = audio->duration;
             }
         }
 
@@ -95,7 +98,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("avcodec_find_decoder 失败");
         initexit = true;
         pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD,10003,"find_decoder error");
+        callJava->onCallError(CHILD_THREAD, 10003, "find_decoder error");
         return;
     } else {
         LOGE("avcodec_find_decoder 成功");
@@ -106,7 +109,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("avcodec_alloc_context3 失败");
         initexit = true;
         pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD,10004,"alloc_context error");
+        callJava->onCallError(CHILD_THREAD, 10004, "alloc_context error");
         return;
     } else {
         LOGE("avcodec_alloc_context3 成功");
@@ -119,7 +122,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("code_parameters_to_context 失败");
         initexit = true;
         pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD,10005,av_err2str(code_parameters_to_context));
+        callJava->onCallError(CHILD_THREAD, 10005, av_err2str(code_parameters_to_context));
         return;
     } else {
         LOGE("code_parameters_to_context 成功");
@@ -131,7 +134,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         LOGE("code_avcodec_open 失败");
         initexit = true;
         pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD,10006,av_err2str(code_avcodec_open));
+        callJava->onCallError(CHILD_THREAD, 10006, av_err2str(code_avcodec_open));
         return;
     } else {
         LOGE("code_avcodec_open 成功");
@@ -144,7 +147,7 @@ void WlFFmpeg::decodeFFmpegThread() {
 
 void WlFFmpeg::start() {
     if (audio == NULL) {
-        callJava->onCallError(CHILD_THREAD,10007,"audio is null");
+        callJava->onCallError(CHILD_THREAD, 10007, "audio is null");
         return;
     }
 
@@ -153,8 +156,21 @@ void WlFFmpeg::start() {
 
     int count = 0;
     while (playState != NULL && !playState->exit) {
+
+        if (playState != NULL && playState->isSeeking) {
+            //正在seek的时候，走下次解码
+            continue;
+        }
+        //控制缓存队列最多缓存40帧
+        if(audio->queue->getQueueSize()>40){
+            continue;
+        }
+
         AVPacket *pPacket = av_packet_alloc();
-        if (av_read_frame(pFormatCtx, pPacket) == 0) {
+        pthread_mutex_lock(&seek_mutex);
+        int code_read_frame = av_read_frame(pFormatCtx, pPacket);
+        pthread_mutex_unlock(&seek_mutex);
+        if (code_read_frame == 0) {
 
             count++;
             if (pPacket->stream_index == audio->streamIndex) {
@@ -251,5 +267,28 @@ void WlFFmpeg::release() {
 }
 
 WlFFmpeg::~WlFFmpeg() {
+    pthread_mutex_destroy(&init_mutex);
+    pthread_mutex_destroy(&seek_mutex);
+}
 
+void WlFFmpeg::seek(int64_t secds) {
+
+    if (duration <= 0) {
+        return;
+    }
+    if (secds >= 0 && secds <= duration) {
+
+        if (audio != NULL) {
+            playState->isSeeking = true;
+            audio->queue->clearAvpacket();
+            audio->clock = 0;
+            audio->last_time = 0;
+
+            pthread_mutex_lock(&seek_mutex);
+            int64_t rel = secds * AV_TIME_BASE;
+            avformat_seek_file(pFormatCtx, -1, INT16_MIN, rel, INT16_MAX, 0);
+            pthread_mutex_unlock(&seek_mutex);
+            playState->isSeeking = false;
+        }
+    }
 }

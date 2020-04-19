@@ -145,6 +145,9 @@ public class TestJni {
 
     public native void nstop();
 
+    //seek到秒
+    public native void seekto(int msc);
+
     //-----------------------------------
 
 }

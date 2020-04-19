@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
@@ -23,9 +24,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "MFFMPEG";
 
+    public int mduration = 0;
     private TextView tvTest;
     private TextView tvVersion;
     private TextView tvProgress;
+    private SeekBar mSeekBar;
 
     private TestJni mTestJni;
 
@@ -40,6 +43,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tvTest = findViewById(R.id.tvTest);
         tvVersion = findViewById(R.id.tvVersion);
         tvProgress = findViewById(R.id.tvProgress);
+        mSeekBar = findViewById(R.id.mSeekBar);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
@@ -49,6 +53,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnPause).setOnClickListener(this);
         findViewById(R.id.btnResume).setOnClickListener(this);
         findViewById(R.id.btnStop).setOnClickListener(this);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean isfromUser) {
+
+                if (isfromUser) {
+                    if (mTestJni != null) {
+                        int seekto = (int) (mduration * ((double) progress / 100));
+                        mTestJni.seekto(seekto);
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
         mTestJni = new TestJni();
@@ -56,6 +82,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.testFFmpeg());
 
         mTestJni.setOnPlayEventListener(new OnPlayEventListener() {
+
             @Override
             public void onStart() {
 
@@ -63,12 +90,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onProgress(final int curtime, final int duration) {
-
+                MainActivity.this.mduration = duration;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        double per = ((double) curtime / (double) duration)*100;
-                        tvProgress.setText("当前播放进度:"+curtime+"/"+duration+"  百分比："+((int)per)+"%");
+                        double per = ((double) curtime / (double) duration) * 100;
+                        tvProgress.setText("当前播放进度:" + curtime + "/" + duration + "  百分比：" + ((int) per) + "%");
                     }
                 });
             }
@@ -84,13 +111,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
 
             @Override
+            public void onComplete() {
+                Log.i(TAG, "播放完成：");
+            }
+
+            @Override
             public void onDestry() {
 
             }
 
             @Override
             public void onError(int code, String msg) {
-                Log.i(TAG,"播放错误 code："+code+ "   msg:"+msg);
+                Log.i(TAG, "播放错误 code：" + code + "   msg:" + msg);
             }
         });
 
@@ -137,7 +169,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 });
                 break;
-                //播放pcm
+            //播放pcm
             case R.id.btnPlayPcm:
                 File pcmFile = new File(Environment.getExternalStorageDirectory(), "mydream.pcm");
 //                File pcmFile = new File(Environment.getExternalStorageDirectory(), "resample.pcm");
@@ -153,8 +185,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     return;
                 }
                 Log.i(TAG, "btnStart");
-//                mTestJni.setSource(mp3File.getAbsolutePath());
-                mTestJni.setSource("555.mp3");
+                mTestJni.setSource(mp3File.getAbsolutePath());
 //                mTestJni.setSource("https://wp.zp68.com/sub/filestores/2016/07/20/2ad2953e033490cced7ab572564e84b5.mp3");
 //                 mTestJni.setSource("http://stormful.oss-cn-shanghai.aliyuncs.com/0era/english/exam/10001_genuine.mp3?Expires=1587228202&OSSAccessKeyId=TMP.3KfDWMD2Es63VZdTpWymksHtsZNg8U4s4Zq2bbG9ym4fR43CpnpNwUe3bqZaXj9ueTFQUZU2ZLPM5D9dA8zZTqdNgUyrX6&Signature=WZpie2CP5fOHjIL6dwyV3Ar9lo8%3D");
                 //                mTestJni.testFFmpeg()

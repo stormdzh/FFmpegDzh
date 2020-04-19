@@ -9,6 +9,7 @@ class WlPlayState{
 public:
     bool exit;
     bool load = true;
+    bool isSeeking= false; //正在seek，停止解码
 public:
     WlPlayState();
     ~WlPlayState();

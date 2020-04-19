@@ -15,6 +15,8 @@ public interface OnPlayEventListener {
 
     void onStop();
 
+    void onComplete();
+
     void onDestry();
 
     void onError(int code, String msg);

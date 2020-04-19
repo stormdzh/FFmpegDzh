@@ -19,7 +19,7 @@ extern "C" {
 
 
 WlPlayState *playState = NULL;
-bool nativeExit=true;
+bool nativeExit = true;
 
 
 extern "C"
@@ -236,7 +236,7 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
             callJava = new WlCallJava(jvm, env, &thiz);
         }
 
-        callJava->onCallLoad(MAIN_THREAD,true);
+        callJava->onCallLoad(MAIN_THREAD, true);
         playState = new WlPlayState();
         mFFmpeg = new WlFFmpeg(playState, callJava, source);
 
@@ -294,11 +294,11 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
     // TODO: implement nstop()
-    if(!nativeExit){
+    if (!nativeExit) {
 
         return;
     }
-    nativeExit=false;
+    nativeExit = false;
     if (mFFmpeg != NULL) {
         mFFmpeg->release();
         delete (mFFmpeg);
@@ -309,11 +309,18 @@ Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
             callJava = NULL;
         }
 
-        if (playState!=NULL){
+        if (playState != NULL) {
             delete (playState);
             playState = NULL;
         }
     }
-    nativeExit=true;
+    nativeExit = true;
 
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_seekto(JNIEnv *env, jobject thiz, jint msc) {
+    // TODO: implement seekto()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->seek(msc);
+    }
 }
