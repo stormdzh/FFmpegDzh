@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
+file(GLOB native_sound_touch "src/main/cpp/soundtouch/SoundTouch/*.cpp")
+
 include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/soundtouch/include)
+include_directories(src/main/cpp/soundtouch/SoundTouch)
 
 message(" add   native-lib")
 message(${ANDROID_ABI})
@@ -17,6 +21,9 @@ add_library( # Sets the name of the library.
         src/main/cpp/WlQueue.cpp
         src/main/cpp/WlPlayState.cpp
         src/main/cpp/TestSLES.cpp
+
+
+        ${native_sound_touch}
         )
 
 
