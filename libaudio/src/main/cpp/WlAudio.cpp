@@ -221,6 +221,10 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 wlaudio->last_time = wlaudio->clock;
                 wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock, wlaudio->duration);
             }
+            
+             //获取音频数据的振幅
+            int db = wlaudio->getPCMDB(reinterpret_cast<char *>(wlaudio->sampleBuffer), bufferSize * 2 * 2);
+            LOGE("--------pcm数据的振幅：----》%d",db);
 
 //            (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->buffer,bufferSize);
             (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->sampleBuffer,
@@ -480,4 +484,22 @@ void WlAudio::setTempo(double newTempo) {
     if (soundTouch != NULL) {
         soundTouch->setTempo(newTempo);
     }
+}
+
+int WlAudio::getPCMDB(char *pcmdata, size_t pcmsize) {
+    int db = 0;
+    short int prevalue = 0;
+    double sum = 0;
+    for (int i = 0; i < pcmsize; i += 2) {
+
+        memcpy(&prevalue, pcmdata + i, 2);
+        sum += abs(prevalue);
+    }
+    sum = sum / (data_size / 2);
+
+    if (sum > 0) {
+        db = 20.0 * log10(sum);
+    }
+
+    return db;
 }

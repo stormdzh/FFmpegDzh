@@ -124,6 +124,10 @@ public:
     void setTempo(double newTempo);
 
 
+    //获取音频数据的振幅
+    int getPCMDB(char *pcmdata,size_t pcmsize);
+
+
 };
 
 #endif //FFMPEGDZH_WLAUDIO_H
