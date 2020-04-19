@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private static final String TAG = "MFFMPEG";
+    private static final String TAG = "ACTMFFMPEG";
 
     public int mduration = 0;
     private TextView tvTest;
@@ -58,12 +58,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean isfromUser) {
 
                 if (isfromUser) {
-                    if (mTestJni != null) {
-                        int seekto = (int) (mduration * ((double) progress / 100));
-                        seekto=230;
-                        Log.i(TAG,"seek 时间："+seekto);
-                        mTestJni.seekto(seekto);
-                    }
+
                 }
             }
 
@@ -74,7 +69,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                int progress = seekBar.getProgress();
+                if (mTestJni != null) {
+                    int seekto = (int) (mduration * ((double) progress / 100));
+                    Log.i(TAG,"seek 时间："+seekto);
+                    mTestJni.seekto(seekto);
+                }
             }
         });
 

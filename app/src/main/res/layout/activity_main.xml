@@ -35,60 +35,91 @@
         android:focusableInTouchMode="true"
         android:text="c++创建线程" />
 
-    <Button
-        android:id="@+id/btnStopNormalThread"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="c++停止线程" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnCoustom"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnStopNormalThread"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="c++停止线程" />
+
+        <Button
+            android:id="@+id/btnCoustom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="生产者和消费者" />
+
+        <Button
+            android:id="@+id/btnPlayPcm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="播放Pcm" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="生产者和消费者" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnPlayPcm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="播放Pcm" />
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="开始播放" />
+
+        <Button
+            android:id="@+id/btnPause"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="暂停" />
+
+        <Button
+            android:id="@+id/btnResume"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="播放" />
+
+        <Button
+            android:id="@+id/btnStop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="停止" />
 
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="开始播放" />
-
-    <Button
-        android:id="@+id/btnPause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="暂停" />
-
-    <Button
-        android:id="@+id/btnResume"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="播放" />
+    </LinearLayout>
 
 
     <TextView
@@ -100,19 +131,10 @@
         android:textColor="#000000"
         android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/btnStop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="停止" />
-
     <SeekBar
-        android:max="100"
         android:id="@+id/mSeekBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:max="100" />
 
 </LinearLayout>
