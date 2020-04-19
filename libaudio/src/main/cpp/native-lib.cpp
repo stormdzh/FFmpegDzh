@@ -287,7 +287,6 @@ Java_com_stormdzh_libaudio_util_TestJni_resume(JNIEnv *env, jobject thiz) {
 }
 
 
-//-----------------------音乐播放器------------------------------------
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
@@ -321,4 +320,13 @@ Java_com_stormdzh_libaudio_util_TestJni_seekto(JNIEnv *env, jobject thiz, jint m
     if (mFFmpeg != NULL) {
         mFFmpeg->seek(msc);
     }
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_setVolume(JNIEnv *env, jobject thiz, jint percent) {
+    // TODO: implement setVolume()
+    if (mFFmpeg != NULL) {
+        mFFmpeg->setVolume(percent);
+    }
 }
+
+//-----------------------音乐播放器------------------------------------

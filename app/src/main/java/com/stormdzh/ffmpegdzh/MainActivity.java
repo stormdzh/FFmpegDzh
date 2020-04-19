@@ -29,6 +29,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView tvVersion;
     private TextView tvProgress;
     private SeekBar mSeekBar;
+    private SeekBar mVolume;
 
     private TestJni mTestJni;
 
@@ -44,6 +45,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tvVersion = findViewById(R.id.tvVersion);
         tvProgress = findViewById(R.id.tvProgress);
         mSeekBar = findViewById(R.id.mSeekBar);
+        mVolume = findViewById(R.id.mVolume);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
@@ -75,6 +77,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     Log.i(TAG,"seek 时间："+seekto);
                     mTestJni.seekto(seekto);
                 }
+            }
+        });
+
+        mVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                Log.i(TAG,"seek 音量："+progress);
+                mTestJni.setVolume(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
 

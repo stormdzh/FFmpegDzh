@@ -55,6 +55,8 @@ public:
 
     //seek 单位是秒
     void seek(int64_t secds);
+
+    void setVolume(int percent);
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H

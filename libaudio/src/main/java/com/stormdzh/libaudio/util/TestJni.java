@@ -157,6 +157,9 @@ public class TestJni {
     //seek到秒
     public native void seekto(int msc);
 
+
+    public native void setVolume(int percent);
+
     //-----------------------------------
 
 }

@@ -55,6 +55,9 @@ public:
     //    缓冲队列
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+    //音量控制
+    SLVolumeItf pcmVolumePlay=NULL;
+
     //音频总时长
     int duration = 0;
     //分值
@@ -88,6 +91,8 @@ public:
     void stop();
 
     void release();
+
+    void setVolume(int percent);
 };
 
 #endif //FFMPEGDZH_WLAUDIO_H
