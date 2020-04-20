@@ -213,7 +213,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.btnStart:
 //                File mp3File = new File(Environment.getExternalStorageDirectory(), "3_test.wav");
 //                File mp3File = new File(Environment.getExternalStorageDirectory(), "mp3test.mp3");
-                File mp3File = new File(Environment.getExternalStorageDirectory(), "bb.mp3");
+//                File mp3File = new File(Environment.getExternalStorageDirectory(), "bb.mp3");
+                File mp3File = new File(Environment.getExternalStorageDirectory(), "蔡琴-出塞曲.ape");
 //                File mp3File = new File(Environment.getExternalStorageDirectory(), "aa.mp3");
                 if (!mp3File.exists()) {
                     Log.i(TAG, "文件不存在");

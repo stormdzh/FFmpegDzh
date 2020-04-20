@@ -92,6 +92,9 @@ public:
     //是否录制pcm的开关
     bool is_record_pcm = false;
 
+    //package 中有多个frame
+    bool readFrameFinised=true;
+
 
 public:
 

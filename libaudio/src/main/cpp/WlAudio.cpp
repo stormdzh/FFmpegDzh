@@ -67,27 +67,30 @@ int WlAudio::resampleAudio(void **pcmBuf) {
             }
         }
 
-        avPacket = av_packet_alloc();
+        if(readFrameFinised) { //只有当前的package中的frame都都去完了，才读取下个package
+            avPacket = av_packet_alloc();
 
-        if (queue->getAvPacket(avPacket) != 0) {
+            if (queue->getAvPacket(avPacket) != 0) {
 
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            avPacket = NULL;
-            continue;
-        }
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                avPacket = NULL;
+                continue;
+            }
 
-        int code_avcodec_send_packet = avcodec_send_packet(avCodecContext, avPacket);
-        if (code_avcodec_send_packet != 0) {
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            avPacket = NULL;
-            continue;
+            int code_avcodec_send_packet = avcodec_send_packet(avCodecContext, avPacket);
+            if (code_avcodec_send_packet != 0) {
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                avPacket = NULL;
+                continue;
+            }
         }
 
         avFrame = av_frame_alloc();
         int code_avcodec_receive_frame = avcodec_receive_frame(avCodecContext, avFrame);
 
+        readFrameFinised=false;
         if (code_avcodec_receive_frame == 0) {
             //重采样
             if (avFrame->channels > 0 && avFrame->channel_layout == 0) {
@@ -123,7 +126,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
                     swr_free(&swrContext);
                     avFrame = NULL;
                 }
-
+                readFrameFinised=true;
                 continue;
 
             }
@@ -151,9 +154,9 @@ int WlAudio::resampleAudio(void **pcmBuf) {
             //Soundtouch 变速使用
             *pcmBuf = buffer;
 
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            avPacket = NULL;
+//            av_packet_free(&avPacket);
+//            av_free(avPacket);
+//            avPacket = NULL;
 
             av_frame_free(&avFrame);
             av_free(avFrame);
@@ -164,6 +167,8 @@ int WlAudio::resampleAudio(void **pcmBuf) {
             break;
 
         } else {
+
+            readFrameFinised=true;
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
