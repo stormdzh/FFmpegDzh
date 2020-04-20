@@ -16,6 +16,9 @@
 
 using namespace soundtouch;
 
+#include "WlPcmBean.h"
+#include "WlBufferQueue.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswresample/swresample.h>
@@ -98,6 +101,12 @@ public:
     bool  isCut = false;
     int endTime =0;
     bool showPcm=false;
+
+    //pcm数据分包
+    pthread_t pcmCallbackThread=NULL;
+    WlBufferQueue *bufferQueue;
+    int defaultPcmSize=4096;
+
 
 
 public:

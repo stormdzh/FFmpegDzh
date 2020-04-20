@@ -36,8 +36,8 @@ public class MediaCodecUtil {
             encoderFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, samperate, 2);
             encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);
             encoderFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-            //如果遇到：异常    java.nio.BufferOverflowException 可以加大setInteger的值
-            encoderFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096 * 2);
+            //如果遇到：异常    java.nio.BufferOverflowException 可以加大setInteger的值  另外一种操作就是把pcm流分包处理下，再输出到这里
+            encoderFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096);
             encoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
             info = new MediaCodec.BufferInfo();
             if (encoder == null) {

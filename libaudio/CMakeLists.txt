@@ -21,6 +21,8 @@ add_library( # Sets the name of the library.
         src/main/cpp/WlQueue.cpp
         src/main/cpp/WlPlayState.cpp
         src/main/cpp/TestSLES.cpp
+        src/main/cpp/WlPcmBean.cpp
+        src/main/cpp/WlBufferQueue.cpp
 
 
         ${native_sound_touch}

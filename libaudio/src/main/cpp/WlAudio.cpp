@@ -26,6 +26,7 @@ WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) 
     this->endTime = 0;
     this->isCut = false;
 
+
 }
 
 
@@ -37,11 +38,87 @@ void *decodePlay(void *data) {
     pthread_exit(&wlaudio->playThread);
 }
 
+void *pcmCallBack(void *data) {
+    WlAudio *audio = static_cast<WlAudio *>(data);
+    audio->bufferQueue = new WlBufferQueue(audio->playState);
+
+    while (audio->playState != NULL && !audio->playState->exit) {
+
+        WlPcmBean *pcmBean = NULL;
+        audio->bufferQueue->getBuffer(&pcmBean);
+        if (pcmBean == NULL) {
+            continue;
+        }
+        if (pcmBean->buffsize <= audio->defaultPcmSize) { //不需要分包
+            //调用java硬编码吧pcm转为aac
+            if (audio->is_record_pcm) {
+                audio->callJava->onCallPcmToAAc(CHILD_THREAD, pcmBean->buffsize,
+                                                pcmBean->buffer);
+            }
+            if (audio->showPcm) {
+                LOGE("返回pcm数据！");
+                audio->callJava->onCallPcmInfo(CHILD_THREAD, pcmBean->buffer,
+                                               pcmBean->buffsize);
+            }
+        } else { //需要分包
+            int pack_num = pcmBean->buffsize / audio->defaultPcmSize;
+            int pack_sub = pcmBean->buffsize % audio->defaultPcmSize;
+
+            for (int i = 0; i < pack_num; i++) {  //分整数
+                char *bf = static_cast<char *>(malloc(audio->defaultPcmSize));
+                memcpy(bf, pcmBean->buffer + i * audio->defaultPcmSize, audio->defaultPcmSize);
+
+
+                //调用java硬编码吧pcm转为aac
+                if (audio->is_record_pcm) {
+                    audio->callJava->onCallPcmToAAc(CHILD_THREAD, audio->defaultPcmSize,
+                                                    bf);
+                }
+                if (audio->showPcm) {
+                    LOGE("返回pcm数据！");
+                    audio->callJava->onCallPcmInfo(CHILD_THREAD, bf,
+                                                   audio->defaultPcmSize);
+                }
+                free(bf);
+                bf = NULL;
+            }
+
+            if (pack_sub > 0) {
+                char *bf = static_cast<char *>(malloc(pack_sub));
+                memcpy(bf, pcmBean->buffer + pack_num * audio->defaultPcmSize, pack_sub);
+
+
+                //调用java硬编码吧pcm转为aac
+                if (audio->is_record_pcm) {
+                    audio->callJava->onCallPcmToAAc(CHILD_THREAD, pack_sub,
+                                                    bf);
+                }
+                if (audio->showPcm) {
+                    LOGE("返回pcm数据！");
+                    audio->callJava->onCallPcmInfo(CHILD_THREAD, bf,
+                                                   pack_sub);
+                }
+                free(bf);
+                bf = NULL;
+            }
+        }
+
+        if (pcmBean != NULL) {
+            delete (pcmBean);
+            pcmBean = NULL;
+        }
+    }
+
+    pthread_exit(&audio->pcmCallbackThread);
+
+}
+
 //FILE *outFile = fopen("/storage/emulated/0/resample.pcm", "w");
 
 void WlAudio::play() {
 
     pthread_create(&playThread, NULL, decodePlay, this);
+    pthread_create(&pcmCallbackThread, NULL, pcmCallBack, this);
 
 }
 
@@ -236,14 +313,17 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
             //回调进度
             if (wlaudio->clock - wlaudio->last_time > 0.5) {
                 wlaudio->last_time = wlaudio->clock;
-                wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock, wlaudio->duration);
+                wlaudio->callJava->onCallTimeInfo(CHILD_THREAD, wlaudio->clock,
+                                                  wlaudio->duration);
             }
 
             //调用java硬编码吧pcm转为aac
-            if (wlaudio->is_record_pcm) {
-                wlaudio->callJava->onCallPcmToAAc(CHILD_THREAD, bufferSize * 2 * 2,
-                                                  wlaudio->sampleBuffer);
-            }
+//            if (wlaudio->is_record_pcm) {
+//                wlaudio->callJava->onCallPcmToAAc(CHILD_THREAD, bufferSize * 2 * 2,
+//                                                  wlaudio->sampleBuffer);
+//            }
+            wlaudio->bufferQueue->putBuffer(wlaudio->sampleBuffer, bufferSize * 2 * 2);
+
             //获取音频数据的振幅
             int db = wlaudio->getPCMDB(reinterpret_cast<char *>(wlaudio->sampleBuffer),
                                        bufferSize * 2 * 2);
@@ -255,13 +335,14 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
 
             //播放裁剪音频
             if (wlaudio->isCut) {
-                if (wlaudio->showPcm) {
-                    LOGE("返回pcm数据！");
-                    wlaudio->callJava->onCallPcmInfo(CHILD_THREAD,wlaudio->sampleBuffer,bufferSize * 2 * 2);
-                }
+//                if (wlaudio->showPcm) {
+//                    LOGE("返回pcm数据！");
+//                    wlaudio->callJava->onCallPcmInfo(CHILD_THREAD, wlaudio->sampleBuffer,
+//                                                     bufferSize * 2 * 2);
+//                }
                 if (wlaudio->clock > wlaudio->endTime) {
                     LOGE("裁剪退出！");
-                    wlaudio->playState->exit=true;
+                    wlaudio->playState->exit = true;
                 }
             }
         }
@@ -293,7 +374,8 @@ void WlAudio::initOpenSLES() {
     SLDataLocator_OutputMix outPutMix = {SL_DATALOCATOR_OUTPUTMIX, outPutMixObject};
     SLDataSink slDataSink = {&outPutMix, NULL};
 
-    SLDataLocator_AndroidBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
+    SLDataLocator_AndroidBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
+                                                      2};
     SLDataFormat_PCM pcm = {
             SL_DATAFORMAT_PCM,
             2,
@@ -311,13 +393,15 @@ void WlAudio::initOpenSLES() {
 //    使用控制音量需要修改为
     const SLInterfaceID ids[4] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO,
                                   SL_IID_PLAYBACKRATE};
-    const SLboolean req[4] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
+    const SLboolean req[4] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+                              SL_BOOLEAN_TRUE};
 
 //    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
 //    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
     SLDataSource slDataSource = {&android_queue, &pcm};
-    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObj, &slDataSource, &slDataSink, 4,
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObj, &slDataSource, &slDataSink,
+                                       4,
                                        ids, req);
 
 
@@ -476,6 +560,14 @@ void WlAudio::release() {
 
     if (callJava != NULL) {
         callJava = NULL;
+    }
+
+    if (bufferQueue != NULL) {
+        bufferQueue->noticeThread();
+        pthread_join(pcmCallbackThread, NULL);
+        bufferQueue->release();
+        delete (bufferQueue);
+        bufferQueue = NULL;
     }
 }
 
