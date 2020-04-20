@@ -10,6 +10,7 @@
 #include "pthread.h"
 #include "WlCallJava.h"
 #include "WlAudio.h"
+#include "WlVideo.h"
 
 extern "C"
 {
@@ -33,6 +34,9 @@ public:
     bool initexit = false;
 
     int duration = 0;
+
+    //视频相关
+    WlVideo *video = NULL;
 
 public:
 
@@ -62,7 +66,10 @@ public:
 
 
     //裁剪音频
-    bool cutAudioPlay(int satrt_tiem,int end_time, bool show_pcm_data);
+    bool cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data);
+
+    //视频相关
+    int getCodecContext(AVCodecParameters *codecpar,AVCodecContext **avCodecContext );
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H

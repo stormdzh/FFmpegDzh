@@ -76,7 +76,7 @@ void WlFFmpeg::decodeFFmpegThread() {
     for (int i = 0; i < pFormatCtx->nb_streams; i++) {
         AVCodecParameters *pParameters = pFormatCtx->streams[i]->codecpar;
         //当前流是音频
-        if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) { //处理音频流
             if (audio == NULL) {
                 audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,
                                     callJava);
@@ -89,56 +89,26 @@ void WlFFmpeg::decodeFFmpegThread() {
                 //当前类中记录音频长度
                 duration = audio->duration;
             }
+        } else if (pParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
+            if (video == NULL) {
+                video = new WlVideo(playState, callJava);
+                video->streamIndex = i;
+                video->codecpar = pParameters;
+                video->time_base = pFormatCtx->streams[i]->time_base;
+            }
         }
 
     }
-    //获取解码器
-    AVCodec *pCodec = avcodec_find_decoder(audio->codecpar->codec_id);
-    if (pCodec == NULL) {
-        LOGE("avcodec_find_decoder 失败");
-        initexit = true;
-        pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD, 10003, "find_decoder error");
-        return;
-    } else {
-        LOGE("avcodec_find_decoder 成功");
+
+    if (audio != NULL) { //打开音频解码器
+        getCodecContext(audio->codecpar, &audio->avCodecContext);
     }
 
-    audio->avCodecContext = avcodec_alloc_context3(pCodec);
-    if (audio->avCodecContext == NULL) {
-        LOGE("avcodec_alloc_context3 失败");
-        initexit = true;
-        pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD, 10004, "alloc_context error");
-        return;
-    } else {
-        LOGE("avcodec_alloc_context3 成功");
-    }
-
-    int code_parameters_to_context = avcodec_parameters_to_context(audio->avCodecContext,
-                                                                   audio->codecpar);
-
-    if (code_parameters_to_context < 0) {
-        LOGE("code_parameters_to_context 失败");
-        initexit = true;
-        pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD, 10005, av_err2str(code_parameters_to_context));
-        return;
-    } else {
-        LOGE("code_parameters_to_context 成功");
+    if (video != NULL) { //打开视频解码器
+        getCodecContext(video->codecpar, &video->avCodecContext);
     }
 
 
-    int code_avcodec_open = avcodec_open2(audio->avCodecContext, pCodec, 0);
-    if (code_avcodec_open < 0) {
-        LOGE("code_avcodec_open 失败");
-        initexit = true;
-        pthread_mutex_unlock(&init_mutex);
-        callJava->onCallError(CHILD_THREAD, 10006, av_err2str(code_avcodec_open));
-        return;
-    } else {
-        LOGE("code_avcodec_open 成功");
-    }
     LOGE("音频准备完毕");
     callJava->onCallPrepare(CHILD_THREAD);
     pthread_mutex_unlock(&init_mutex);
@@ -153,6 +123,7 @@ void WlFFmpeg::start() {
 
     //调用播放
     audio->play();
+    video->play();
 
     int count = 0;
     while (playState != NULL && !playState->exit) {
@@ -179,10 +150,13 @@ void WlFFmpeg::start() {
         if (code_read_frame == 0) {
 
             count++;
-            if (pPacket->stream_index == audio->streamIndex) {
+            if (pPacket->stream_index == audio->streamIndex) { //音频流
                 LOGE("解码帧：%d", count);
 
                 audio->queue->putAvPacket(pPacket);
+            } else if (pPacket->stream_index == video->streamIndex) {//视频流
+                video->queue->putAvPacket(pPacket);
+                LOGE("获取到视频流");
             } else {
                 av_packet_free(&pPacket);
                 av_free(pPacket);
@@ -324,12 +298,63 @@ void WlFFmpeg::setMute(int type) {
 bool WlFFmpeg::cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data) {
     if (satrt_tiem >= 0 && end_time < duration && satrt_tiem < end_time) {
 
-        audio->isCut=true;
-        audio->endTime=end_time;
-        audio->showPcm=show_pcm_data;
+        audio->isCut = true;
+        audio->endTime = end_time;
+        audio->showPcm = show_pcm_data;
         seek(satrt_tiem);
 
         return true;
     }
 
+}
+
+int WlFFmpeg::getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext) {
+    //获取解码器
+    AVCodec *pCodec = avcodec_find_decoder(codecpar->codec_id);
+    if (pCodec == NULL) {
+        LOGE("avcodec_find_decoder 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
+        callJava->onCallError(CHILD_THREAD, 10003, "find_decoder error");
+        return -1;
+    } else {
+        LOGE("avcodec_find_decoder 成功");
+    }
+
+    *avCodecContext = avcodec_alloc_context3(pCodec);
+    if (*avCodecContext == NULL) {
+        LOGE("avcodec_alloc_context3 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
+        callJava->onCallError(CHILD_THREAD, 10004, "alloc_context error");
+        return -1;
+    } else {
+        LOGE("avcodec_alloc_context3 成功");
+    }
+
+    int code_parameters_to_context = avcodec_parameters_to_context(*avCodecContext,
+                                                                   codecpar);
+
+    if (code_parameters_to_context < 0) {
+        LOGE("code_parameters_to_context 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
+        callJava->onCallError(CHILD_THREAD, 10005, av_err2str(code_parameters_to_context));
+        return -1;
+    } else {
+        LOGE("code_parameters_to_context 成功");
+    }
+
+
+    int code_avcodec_open = avcodec_open2(*avCodecContext, pCodec, 0);
+    if (code_avcodec_open < 0) {
+        LOGE("code_avcodec_open 失败");
+        initexit = true;
+        pthread_mutex_unlock(&init_mutex);
+        callJava->onCallError(CHILD_THREAD, 10006, av_err2str(code_avcodec_open));
+        return -1;
+    } else {
+        LOGE("code_avcodec_open 成功");
+    }
+    return 0;
 }

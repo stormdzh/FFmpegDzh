@@ -24,6 +24,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/WlPcmBean.cpp
         src/main/cpp/WlBufferQueue.cpp
 
+        src/main/cpp/WlVideo.cpp
 
         ${native_sound_touch}
         )
