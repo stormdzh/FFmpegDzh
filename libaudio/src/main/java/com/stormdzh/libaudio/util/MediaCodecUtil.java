@@ -26,8 +26,11 @@ public class MediaCodecUtil {
     private int aacsamplerate = 4;
 
     boolean isInitSuccess = false;
+    int sampleRate = 0;
+    float recordTime = 0;
 
     public boolean initMediacodec(int samperate, File outfile) {
+        this.sampleRate = samperate;
         try {
             aacsamplerate = getADTSsamplerate(samperate);
             encoderFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, samperate, 2);
@@ -57,6 +60,9 @@ public class MediaCodecUtil {
     public void encodecPcmToAAc(int size, byte[] buffer) {
         if (!isInitSuccess) return;
         if (buffer != null && encoder != null) {
+            recordTime += size * 1.0 / (sampleRate * 2 * (16 / 8));
+            Log.i("ZZZ", "size:" + size+"   sampleRate:"+sampleRate);
+            Log.i("ZZZ", "recordTime:" + recordTime);
             int inputBufferindex = encoder.dequeueInputBuffer(0);
             if (inputBufferindex >= 0) {
                 ByteBuffer byteBuffer = encoder.getInputBuffers()[inputBufferindex];
