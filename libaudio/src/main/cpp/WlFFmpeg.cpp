@@ -157,12 +157,18 @@ void WlFFmpeg::start() {
     int count = 0;
     while (playState != NULL && !playState->exit) {
 
+        if (playState->isSeeking) {
+            //休眠100毫秒
+            av_usleep(1000 * 100);
+        }
         if (playState != NULL && playState->isSeeking) {
             //正在seek的时候，走下次解码
             continue;
         }
         //控制缓存队列最多缓存40帧
-        if (audio->queue->getQueueSize() > 40) {
+        if (audio->queue->getQueueSize() > 100) {
+            //休眠100毫秒
+            av_usleep(1000 * 100);
             continue;
         }
 
@@ -187,6 +193,8 @@ void WlFFmpeg::start() {
 
             if (playState != NULL && !playState->exit) {
                 if (audio->queue->getQueueSize() > 0) {
+                    //休眠100毫秒
+                    av_usleep(1000 * 100);
                     continue;
                 } else {
                     playState->exit = true;

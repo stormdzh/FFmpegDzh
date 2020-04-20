@@ -46,11 +46,19 @@ int WlAudio::resampleAudio(void **pcmBuf) {
 
     while (playState != NULL && !playState->exit) {
 
+        if(playState->isSeeking){
+            //休眠100毫秒
+            av_usleep(1000*100);
+            continue;
+        }
+
         if (queue->getQueueSize() <= 0) {
             if (!playState->load) {
                 playState->load = true;
                 callJava->onCallLoad(CHILD_THREAD, true);
             }
+            //休眠100毫秒
+            av_usleep(1000*100);
             continue;
         } else {
             if (playState->load) {
