@@ -375,4 +375,13 @@ Java_com_stormdzh_libaudio_util_TestJni_getSampleRate(JNIEnv *env, jobject thiz)
         sampleRate = mFFmpeg->audio->avCodecContext->sample_rate;
     }
     return sampleRate;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_startRecordPcm(JNIEnv *env, jobject thiz,
+                                                       jboolean is_record_pcm) {
+    // TODO: implement startRecordPcm()
+
+    if (mFFmpeg != NULL) {
+        mFFmpeg->audio->is_record_pcm = is_record_pcm;
+    }
 }

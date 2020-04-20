@@ -25,6 +25,8 @@ public class MediaCodecUtil {
     private byte[] outByteBuffer = null;
     private int aacsamplerate = 4;
 
+    boolean isInitSuccess = false;
+
     public boolean initMediacodec(int samperate, File outfile) {
         try {
             aacsamplerate = getADTSsamplerate(samperate);
@@ -32,7 +34,7 @@ public class MediaCodecUtil {
             encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);
             encoderFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
             //如果遇到：异常    java.nio.BufferOverflowException 可以加大setInteger的值
-            encoderFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096*2);
+            encoderFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096 * 2);
             encoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
             info = new MediaCodec.BufferInfo();
             if (encoder == null) {
@@ -42,6 +44,7 @@ public class MediaCodecUtil {
             encoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             outputStream = new FileOutputStream(outfile);
             encoder.start();
+            isInitSuccess = true;
             return true;
         } catch (IOException e) {
             Log.d("DDD", e.getMessage());
@@ -50,16 +53,15 @@ public class MediaCodecUtil {
         }
     }
 
-    boolean isEncoding=false;
+
     public void encodecPcmToAAc(int size, byte[] buffer) {
-        if(isEncoding) return;
-        isEncoding=true;
+        if (!isInitSuccess) return;
         if (buffer != null && encoder != null) {
             int inputBufferindex = encoder.dequeueInputBuffer(0);
             if (inputBufferindex >= 0) {
                 ByteBuffer byteBuffer = encoder.getInputBuffers()[inputBufferindex];
                 byteBuffer.clear();
-                Log.i("DDD","buffer:"+buffer.length);
+                Log.i("DDD", "buffer:" + buffer.length);
                 byteBuffer.put(buffer);
                 encoder.queueInputBuffer(inputBufferindex, 0, size, 0, 0);
             }
@@ -89,7 +91,6 @@ public class MediaCodecUtil {
                 }
             }
         }
-        isEncoding=false;
     }
 
     private void addADtsHeader(byte[] packet, int packetLen, int samplerate) {
@@ -150,6 +151,35 @@ public class MediaCodecUtil {
                 break;
         }
         return rate;
+    }
+
+    public void releaseMedicacodec() {
+        if (encoder == null) {
+            return;
+        }
+        try {
+            outputStream.close();
+            outputStream = null;
+            encoder.stop();
+            encoder.release();
+            encoder = null;
+            encoderFormat = null;
+            info = null;
+            isInitSuccess = false;
+
+            Log.d("MFFMPEG", "录制完成...");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                outputStream = null;
+            }
+        }
     }
 
 }

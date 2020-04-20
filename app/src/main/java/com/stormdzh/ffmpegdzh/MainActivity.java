@@ -64,6 +64,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnTempo1).setOnClickListener(this);
         findViewById(R.id.btnTempo2).setOnClickListener(this);
         findViewById(R.id.btnStartRecord).setOnClickListener(this);
+        findViewById(R.id.btnStopRecord).setOnClickListener(this);
+        findViewById(R.id.btnPuaseRecord).setOnClickListener(this);
+        findViewById(R.id.btnContinueRecord).setOnClickListener(this);
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -263,7 +266,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnStartRecord:
                 File outFile = new File(Environment.getExternalStorageDirectory(), "pcmToAac.aac");
+                if(outFile.exists()){
+                    outFile.delete();
+                }
                 mTestJni.startRecord(outFile);
+                break;
+            case R.id.btnStopRecord:
+                mTestJni.stopRecord();
+                break;
+            case R.id.btnPuaseRecord:
+                mTestJni.paauseRecord();
+                break;
+            case R.id.btnContinueRecord:
+                mTestJni.continueRecord();
                 break;
         }
     }

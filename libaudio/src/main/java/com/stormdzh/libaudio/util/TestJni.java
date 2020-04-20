@@ -47,6 +47,7 @@ public class TestJni {
     }
 
     public interface OnErrerListener {
+
         void onError(int code, String msg);
     }
 
@@ -188,25 +189,50 @@ public class TestJni {
 
     //-----------------------------------
 
-    MediaCodecUtil mMediaCodecUtil = null;
+    private native void startRecordPcm(boolean isRecordPcm);
 
-    boolean isMediaCodecSuc = false;
+    MediaCodecUtil mMediaCodecUtil = null;
+    private boolean isStartRecordPcm = false;
+
+    public void stopRecord() {
+        if (!isStartRecordPcm) {
+            return;
+        }
+        startRecordPcm(false);
+        Log.i("DDD", "encodecPcmToAAc  停止");
+        isStartRecordPcm = false;
+        if (mMediaCodecUtil == null) {
+            mMediaCodecUtil.releaseMedicacodec();
+        }
+    }
 
     public void startRecord(File outFile) {
+        if (isStartRecordPcm)
+            return;
+        isStartRecordPcm = true;
         if (mMediaCodecUtil == null) {
             mMediaCodecUtil = new MediaCodecUtil();
         }
         Log.i("DDD", "encodecPcmToAAc  getSampleRate:" + getSampleRate());
         if (getSampleRate() > 0) {
-            isMediaCodecSuc = mMediaCodecUtil.initMediacodec(getSampleRate(), outFile);
+            mMediaCodecUtil.initMediacodec(getSampleRate(), outFile);
+            Log.i("DDD", "encodecPcmToAAc  开始");
+            startRecordPcm(true);
         }
-        Log.i("DDD", "encodecPcmToAAc  isMediaCodecSuc:" + isMediaCodecSuc);
+    }
+
+    public void continueRecord() {
+        startRecordPcm(true);
+    }
+
+    public void paauseRecord() {
+        startRecordPcm(false);
     }
 
     //C++回调的方法
     private void encodecPcmToAAc(final int size, final byte[] buffer) {
 //        Log.i("DDD","encodecPcmToAAc  size:"+size);
-        if (mMediaCodecUtil != null && isMediaCodecSuc) {
+        if (mMediaCodecUtil != null) {
             mMediaCodecUtil.encodecPcmToAAc(size, buffer);
 
         }

@@ -46,8 +46,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="c++停止线程" />
 
         <Button
@@ -56,8 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="生产者和消费者" />
 
         <Button
@@ -66,8 +62,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="播放Pcm" />
 
     </LinearLayout>
@@ -84,8 +78,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="开始播放" />
 
         <Button
@@ -94,8 +86,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="暂停" />
 
         <Button
@@ -104,8 +94,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="播放" />
 
         <Button
@@ -114,8 +102,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="停止" />
 
 
@@ -160,8 +146,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="左声道" />
 
         <Button
@@ -170,8 +154,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="右声道" />
 
         <Button
@@ -180,8 +162,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="立体声" />
 
     </LinearLayout>
@@ -197,8 +177,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="变调1" />
 
         <Button
@@ -207,8 +185,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="变调1.5" />
 
         <Button
@@ -217,8 +193,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="变速1" />
 
         <Button
@@ -227,8 +201,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:text="变速2" />
 
     </LinearLayout>
@@ -244,9 +216,28 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:text="开始录制" />
+            android:text="开始录制PCM" />
+        <Button
+            android:id="@+id/btnPuaseRecord"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="暂停录制PCM" />
+        <Button
+            android:id="@+id/btnContinueRecord"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="继续录制PCM" />
+        <Button
+            android:id="@+id/btnStopRecord"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="停止录制PCM" />
     </LinearLayout>
 
 

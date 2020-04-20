@@ -13,6 +13,7 @@
 #include "WlCallJava.h"
 
 #include "SoundTouch.h"
+
 using namespace soundtouch;
 
 extern "C" {
@@ -46,7 +47,7 @@ public:
     //采样率
     int sample_rate = 0;
     //采样个数
-    int nb=0;
+    int nb = 0;
 
     //    引擎
     SLObjectItf engineObject = NULL;
@@ -61,9 +62,9 @@ public:
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
     //音量控制
-    SLVolumeItf pcmVolumePlay=NULL;
+    SLVolumeItf pcmVolumePlay = NULL;
     //声道控制
-    SLMuteSoloItf pcmMuteSoloPlay =NULL;
+    SLMuteSoloItf pcmMuteSoloPlay = NULL;
 
     //音频总时长
     int duration = 0;
@@ -72,20 +73,23 @@ public:
     //当前时间
     double now_time = 0;
 
-    double clock=0;
+    double clock = 0;
 
-    int last_time=0;
+    int last_time = 0;
 
     //默认音量
-    int defaultVolume=100;
+    int defaultVolume = 100;
 
 
     //soundTouch
-    SoundTouch *soundTouch=NULL;
-    SAMPLETYPE *sampleBuffer=NULL;
-    bool finished=true;
-    uint8_t *out_buffer =NULL;
-    int sound_touch_nb=0; //soundtouch返回的采样个数
+    SoundTouch *soundTouch = NULL;
+    SAMPLETYPE *sampleBuffer = NULL;
+    bool finished = true;
+    uint8_t *out_buffer = NULL;
+    int sound_touch_nb = 0; //soundtouch返回的采样个数
+
+    //是否录制pcm的开关
+    bool is_record_pcm = false;
 
 
 public:
@@ -112,20 +116,22 @@ public:
 
     void setVolume(int percent);
 
-     //0:右声道 1：左声道  2：立体声
+    //0:右声道 1：左声道  2：立体声
     void setMute(int type);
 
 
     //sountouch
     int getSoundTouchData();
+
     //变调
     void setPitch(double newPitch);
+
     //变速
     void setTempo(double newTempo);
 
 
     //获取音频数据的振幅
-    int getPCMDB(char *pcmdata,size_t pcmsize);
+    int getPCMDB(char *pcmdata, size_t pcmsize);
 
 
 };
