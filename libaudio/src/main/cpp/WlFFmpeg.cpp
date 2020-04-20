@@ -234,6 +234,12 @@ void WlFFmpeg::release() {
         audio = NULL;
     }
 
+    if (video != NULL) {
+        video->release();
+        delete (video);
+        video = NULL;
+    }
+
     if (pFormatCtx != NULL) {
         avformat_close_input(&pFormatCtx);
         avformat_free_context(pFormatCtx);

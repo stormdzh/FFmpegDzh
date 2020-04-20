@@ -10,6 +10,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/time.h>
 };
 
 class WlVideo {
@@ -31,6 +32,8 @@ public:
     ~WlVideo();
 
     void play();
+
+    void release();
 };
 
 #endif //FFMPEGDZH_WLVIDEO_H
