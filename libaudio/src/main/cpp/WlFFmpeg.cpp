@@ -320,3 +320,16 @@ void WlFFmpeg::setMute(int type) {
     }
 
 }
+
+bool WlFFmpeg::cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data) {
+    if (satrt_tiem >= 0 && end_time < duration && satrt_tiem < end_time) {
+
+        audio->isCut=true;
+        audio->endTime=end_time;
+        audio->showPcm=show_pcm_data;
+        seek(satrt_tiem);
+
+        return true;
+    }
+
+}

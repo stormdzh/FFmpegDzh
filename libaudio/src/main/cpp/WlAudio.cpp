@@ -22,6 +22,10 @@ WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) 
     //设置变调
     soundTouch->setTempo(1.0f);
 
+    this->showPcm = false;
+    this->endTime = 0;
+    this->isCut = false;
+
 }
 
 
@@ -67,7 +71,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
             }
         }
 
-        if(readFrameFinised) { //只有当前的package中的frame都都去完了，才读取下个package
+        if (readFrameFinised) { //只有当前的package中的frame都都去完了，才读取下个package
             avPacket = av_packet_alloc();
 
             if (queue->getAvPacket(avPacket) != 0) {
@@ -90,7 +94,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
         avFrame = av_frame_alloc();
         int code_avcodec_receive_frame = avcodec_receive_frame(avCodecContext, avFrame);
 
-        readFrameFinised=false;
+        readFrameFinised = false;
         if (code_avcodec_receive_frame == 0) {
             //重采样
             if (avFrame->channels > 0 && avFrame->channel_layout == 0) {
@@ -126,7 +130,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
                     swr_free(&swrContext);
                     avFrame = NULL;
                 }
-                readFrameFinised=true;
+                readFrameFinised = true;
                 continue;
 
             }
@@ -168,7 +172,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
 
         } else {
 
-            readFrameFinised=true;
+            readFrameFinised = true;
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -248,6 +252,18 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
 //            (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->buffer,bufferSize);
             (*wlaudio->pcmBufferQueue)->Enqueue(wlaudio->pcmBufferQueue, wlaudio->sampleBuffer,
                                                 bufferSize * 2 * 2);
+
+            //播放裁剪音频
+            if (wlaudio->isCut) {
+                if (wlaudio->showPcm) {
+                    LOGE("返回pcm数据！");
+                    wlaudio->callJava->onCallPcmInfo(CHILD_THREAD,wlaudio->sampleBuffer,bufferSize * 2 * 2);
+                }
+                if (wlaudio->clock > wlaudio->endTime) {
+                    LOGE("裁剪退出！");
+                    wlaudio->playState->exit=true;
+                }
+            }
         }
     }
 }

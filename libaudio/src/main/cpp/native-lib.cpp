@@ -385,3 +385,13 @@ Java_com_stormdzh_libaudio_util_TestJni_startRecordPcm(JNIEnv *env, jobject thiz
         mFFmpeg->audio->is_record_pcm = is_record_pcm;
     }
 }
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_stormdzh_libaudio_util_TestJni_cutAudioPlay(JNIEnv *env, jobject thiz, jint satrt_tiem,
+                                                     jint end_time, jboolean show_pcm_data) {
+    if(mFFmpeg!=NULL){
+        return mFFmpeg->cutAudioPlay(satrt_tiem,end_time,show_pcm_data);
+    }
+    return false;
+}

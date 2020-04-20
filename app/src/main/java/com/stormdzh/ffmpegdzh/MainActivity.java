@@ -67,6 +67,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnStopRecord).setOnClickListener(this);
         findViewById(R.id.btnPuaseRecord).setOnClickListener(this);
         findViewById(R.id.btnContinueRecord).setOnClickListener(this);
+        findViewById(R.id.btnCutAudioPlay).setOnClickListener(this);
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -280,6 +281,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnContinueRecord:
                 mTestJni.continueRecord();
+                break;
+            case R.id.btnCutAudioPlay:
+                File cut = new File(Environment.getExternalStorageDirectory(), "bb.mp3");
+                mTestJni.setSource(cut.getAbsolutePath());
+                mTestJni.setPlayerPrepareListener(new PlayerPrepareListener() {
+                    @Override
+                    public void onPrepared() {
+                        mTestJni.mCutAudioPlay(20,40,true);
+                    }
+                });
+                mTestJni.mprepare();
+
                 break;
         }
     }

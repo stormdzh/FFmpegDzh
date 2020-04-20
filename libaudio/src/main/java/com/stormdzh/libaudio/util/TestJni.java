@@ -238,5 +238,18 @@ public class TestJni {
         }
     }
 
+    //------------------音频裁剪-------------------------
+    public  void mCutAudioPlay(int satrtTiem,int endTime,boolean showPcmData){
+        if(cutAudioPlay(satrtTiem,endTime,showPcmData)){
+            start();
+        }
+    }
+
+    public void onCallPcmInfo(byte[] buffer,int size){
+        Log.i("DDD","获取到pcm数据 size："+size);
+    }
+
+    private native boolean cutAudioPlay(int satrtTiem,int endTime,boolean showPcmData);
+
 
 }

@@ -95,6 +95,10 @@ public:
     //package 中有多个frame
     bool readFrameFinised=true;
 
+    bool  isCut = false;
+    int endTime =0;
+    bool showPcm=false;
+
 
 public:
 

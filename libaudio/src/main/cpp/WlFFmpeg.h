@@ -59,6 +59,10 @@ public:
     void setVolume(int percent);
 
     void setMute(int type);
+
+
+    //裁剪音频
+    bool cutAudioPlay(int satrt_tiem,int end_time, bool show_pcm_data);
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H
