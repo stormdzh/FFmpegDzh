@@ -280,14 +280,14 @@ void WlAudio::initOpenSLES() {
 //    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
 //    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
 //    使用控制音量需要修改为
-    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
-    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
+    const SLInterfaceID ids[4] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO,SL_IID_PLAYBACKRATE};
+    const SLboolean req[4] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
 
 //    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
 //    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
     SLDataSource slDataSource = {&android_queue, &pcm};
-    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObj, &slDataSource, &slDataSink, 3,
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObj, &slDataSource, &slDataSink, 4,
                                        ids, req);
 
 
