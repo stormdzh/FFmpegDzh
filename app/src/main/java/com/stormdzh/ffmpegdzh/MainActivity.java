@@ -2,6 +2,7 @@ package com.stormdzh.ffmpegdzh;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnPuaseRecord).setOnClickListener(this);
         findViewById(R.id.btnContinueRecord).setOnClickListener(this);
         findViewById(R.id.btnCutAudioPlay).setOnClickListener(this);
+        findViewById(R.id.btnOpenGLES).setOnClickListener(this);
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -294,6 +296,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 });
                 mTestJni.mprepare();
 
+                break;
+
+            case R.id.btnOpenGLES:
+
+                startActivity(new Intent(this,TestOpenGlesActivity.class));
                 break;
         }
     }
