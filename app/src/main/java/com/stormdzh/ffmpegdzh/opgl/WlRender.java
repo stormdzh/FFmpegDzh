@@ -28,13 +28,18 @@ public class WlRender implements GLSurfaceView.Renderer {
 
     private final float[] vertexData = {
 
+//            -1f, 0,
+//            0, -1f,
+//            0, 1f,
+//
+//            0, 1f,
+//            0, -1f,
+//            1f, 0
+
+
             -1f, 0,
             0, -1f,
             0, 1f,
-
-
-            0, 1f,
-            0, -1f,
             1f, 0
 
     };
@@ -86,6 +91,8 @@ public class WlRender implements GLSurfaceView.Renderer {
 //        一个三角形
 //        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 //        两个三角形
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+//        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+//        复用前面三角形的两个顶点 绘制过程v1 v2 v3 ; v2 v3 v4
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 }
