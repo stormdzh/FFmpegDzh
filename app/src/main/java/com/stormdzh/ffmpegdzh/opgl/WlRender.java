@@ -1,8 +1,14 @@
 package com.stormdzh.ffmpegdzh.opgl;
 
-import android.opengl.GLES10;
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+
+import com.stormdzh.ffmpegdzh.R;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -13,9 +19,46 @@ import javax.microedition.khronos.opengles.GL10;
  * @CreateDate: 2020-04-22 10:17
  */
 public class WlRender implements GLSurfaceView.Renderer {
+
+    private Context mContext;
+    private int program;
+    private int avPosition;
+    private int afColor;
+
+
+    private final float[] vertexData = {
+
+            -1f, 0,
+            0, 1f,
+            1f, 0,
+
+//            -1f, -1f,
+//            0, 0,
+//            1f, -1f
+    };
+
+    private FloatBuffer vertexBuffer;
+
+    public WlRender(Context context) {
+        this.mContext = context;
+        vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer()
+                .put(vertexData);
+
+        vertexBuffer.position(0);
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
+        String vertexSource = WlShaderUtil.readRawText(mContext, R.raw.vertex_shader);
+        String fragmentSource = WlShaderUtil.readRawText(mContext, R.raw.fragment_shader);
+        program = WlShaderUtil.creteProgram(vertexSource, fragmentSource);
+        if (program > 0) {
+            avPosition = GLES20.glGetAttribLocation(program, "av_Position");
+            afColor = GLES20.glGetUniformLocation(program, "af_Color");
+        }
     }
 
     @Override
@@ -29,6 +72,15 @@ public class WlRender implements GLSurfaceView.Renderer {
         //清屏
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         //清屏为红色
-        GLES20.glClearColor(1.0f, 0, 0, 1.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+        GLES20.glUseProgram(program);
+
+        GLES20.glUniform4f(afColor, 1f, 0, 0, 1);
+
+        GLES20.glEnableVertexAttribArray(avPosition);
+        GLES20.glVertexAttribPointer(avPosition, 2, GLES20.GL_FLOAT, false, 2 * 4, vertexBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
 }

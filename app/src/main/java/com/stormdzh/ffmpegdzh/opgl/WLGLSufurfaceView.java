@@ -22,6 +22,6 @@ public class WLGLSufurfaceView extends GLSurfaceView {
 
     private void init() {
         setEGLContextClientVersion(2);
-        setRenderer(new WlRender());
+        setRenderer(new WlRender(getContext()));
     }
 }
