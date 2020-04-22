@@ -22,6 +22,9 @@ public class WLGLSufurfaceView extends GLSurfaceView {
 
     private void init() {
         setEGLContextClientVersion(2);
-        setRenderer(new WlRender(getContext()));
+          //渲染三角形
+//        setRenderer(new WlRender(getContext()));
+        //渲染图片
+        setRenderer(new WlPicRender(getContext()));
     }
 }

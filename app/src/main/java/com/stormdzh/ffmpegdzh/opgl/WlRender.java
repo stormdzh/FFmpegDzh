@@ -59,8 +59,8 @@ public class WlRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
-        String vertexSource = WlShaderUtil.readRawText(mContext, R.raw.vertex_shader);
-        String fragmentSource = WlShaderUtil.readRawText(mContext, R.raw.fragment_shader);
+        String vertexSource = WlShaderUtil.readRawText(mContext, R.raw.vertex_triangle_shader);
+        String fragmentSource = WlShaderUtil.readRawText(mContext, R.raw.fragment_triangle_shader);
         program = WlShaderUtil.creteProgram(vertexSource, fragmentSource);
         if (program > 0) {
             avPosition = GLES20.glGetAttribLocation(program, "av_Position");
