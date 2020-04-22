@@ -29,12 +29,14 @@ public class WlRender implements GLSurfaceView.Renderer {
     private final float[] vertexData = {
 
             -1f, 0,
+            0, -1f,
             0, 1f,
-            1f, 0,
 
-//            -1f, -1f,
-//            0, 0,
-//            1f, -1f
+
+            0, 1f,
+            0, -1f,
+            1f, 0
+
     };
 
     private FloatBuffer vertexBuffer;
@@ -81,6 +83,9 @@ public class WlRender implements GLSurfaceView.Renderer {
 
         GLES20.glEnableVertexAttribArray(avPosition);
         GLES20.glVertexAttribPointer(avPosition, 2, GLES20.GL_FLOAT, false, 2 * 4, vertexBuffer);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+//        一个三角形
+//        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+//        两个三角形
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
     }
 }
