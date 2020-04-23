@@ -104,6 +104,8 @@ public class WlVideoRender implements GLSurfaceView.Renderer {
 
         renderYUV();
 
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
     }
 
     private void intRenderYUV() {
@@ -182,8 +184,8 @@ public class WlVideoRender implements GLSurfaceView.Renderer {
         y = null;
         u = null;
         v = null;
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        //这句代码不要写在这，播放中可能会有黑色闪屏
+//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 
 }
