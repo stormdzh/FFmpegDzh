@@ -25,6 +25,7 @@ public:
     jmethodID jmid_complete;
     jmethodID jmid_pcmtoaac;
     jmethodID jmid_pcminfo;
+    jmethodID jmid_renderyuv;
 
 public:
     WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *jobj);
@@ -44,6 +45,8 @@ public:
     void onCallPcmToAAc(int type,int size,void *buffer);
 
     void onCallPcmInfo(int type,void *buffer,int size);
+
+    void onCallRenderYUV(int width,int height,uint8_t *fy,uint8_t *fu,uint8_t *fv);
 
 
 };

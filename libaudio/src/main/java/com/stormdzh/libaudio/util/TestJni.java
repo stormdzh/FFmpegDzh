@@ -239,17 +239,24 @@ public class TestJni {
     }
 
     //------------------音频裁剪-------------------------
-    public  void mCutAudioPlay(int satrtTiem,int endTime,boolean showPcmData){
-        if(cutAudioPlay(satrtTiem,endTime,showPcmData)){
+    public void mCutAudioPlay(int satrtTiem, int endTime, boolean showPcmData) {
+        if (cutAudioPlay(satrtTiem, endTime, showPcmData)) {
             start();
         }
     }
 
-    public void onCallPcmInfo(byte[] buffer,int size){
-        Log.i("DDD","获取到pcm数据 size："+size);
+    public void onCallPcmInfo(byte[] buffer, int size) {
+        Log.i("DDD", "获取到pcm数据 size：" + size);
     }
 
-    private native boolean cutAudioPlay(int satrtTiem,int endTime,boolean showPcmData);
+    private native boolean cutAudioPlay(int satrtTiem, int endTime, boolean showPcmData);
+
+
+    //------------------视频播放器-------------------------
+    public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
+
+        Log.i("DDD", "收到ffmpeg回调过来yuv数据 onCallRenderYUV");
+    }
 
 
 }
