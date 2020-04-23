@@ -3,6 +3,8 @@ package com.stormdzh.libaudio.util;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
+
 import java.io.File;
 
 /**
@@ -253,9 +255,19 @@ public class TestJni {
 
 
     //------------------视频播放器-------------------------
+
+    private WLGLSufurfaceView mWLGLSufurfaceView;
+
+    public void setGLSufurfaceView(WLGLSufurfaceView glSufurfaceView) {
+        this.mWLGLSufurfaceView = glSufurfaceView;
+    }
+
     public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
 
         Log.i("DDD", "收到ffmpeg回调过来yuv数据 onCallRenderYUV");
+        if (mWLGLSufurfaceView != null) {
+            mWLGLSufurfaceView.setYUVData(width, height, y, u, v);
+        }
     }
 
 

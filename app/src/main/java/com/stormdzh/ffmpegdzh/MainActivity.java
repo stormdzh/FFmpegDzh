@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import com.stormdzh.libaudio.util.OnPlayEventListener;
 import com.stormdzh.libaudio.util.PlayerPrepareListener;
 import com.stormdzh.libaudio.util.TestJni;
+import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,11 +35,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private TestJni mTestJni;
 
+    private WLGLSufurfaceView wlglSufurfaceView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mTestJni = new TestJni();
 
         requestPermissions();
 
@@ -47,6 +50,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tvProgress = findViewById(R.id.tvProgress);
         mSeekBar = findViewById(R.id.mSeekBar);
         mVolume = findViewById(R.id.mVolume);
+        wlglSufurfaceView = findViewById(R.id.glSufurfaceView);
+        mTestJni.setGLSufurfaceView(wlglSufurfaceView);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
@@ -70,6 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnContinueRecord).setOnClickListener(this);
         findViewById(R.id.btnCutAudioPlay).setOnClickListener(this);
         findViewById(R.id.btnOpenGLES).setOnClickListener(this);
+
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -115,7 +121,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         });
 
 
-        mTestJni = new TestJni();
         tvTest.setText(mTestJni.stringFromJni());
         tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.testFFmpeg());
 

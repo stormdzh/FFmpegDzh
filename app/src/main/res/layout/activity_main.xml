@@ -279,5 +279,11 @@
         </LinearLayout>
 
 
+        <com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView
+            android:id="@+id/glSufurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+
     </LinearLayout>
 </ScrollView>
