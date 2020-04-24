@@ -7,6 +7,7 @@
 
 #include "WlQueue.h"
 #include "WlCallJava.h"
+#include "WlAudio.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -28,6 +29,12 @@ public:
 
     pthread_t thread_play;
 
+    //处理音视频同步
+    WlAudio *audio=NULL;
+    double clock=0;
+    double delayTime=0;
+    double defualtDelayTime=0.004;
+
 public:
     WlVideo(WlPlayState *playState, WlCallJava *wlCallJava);
 
@@ -36,6 +43,11 @@ public:
     void play();
 
     void release();
+
+    //获取音频进度和视频进度差值
+    double getFrameDiffTime(AVFrame *avFrame);
+    //获取视频需要延迟的时间
+    double getDelayTime(double diff);
 };
 
 #endif //FFMPEGDZH_WLVIDEO_H

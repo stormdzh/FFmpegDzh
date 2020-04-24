@@ -81,11 +81,18 @@ void *playVide(void *data) {
         LOGE("子线程解码到avframe成功");
 
         if (avFrame->format = AV_PIX_FMT_YUV420P) {
+
+            double diff = video->getFrameDiffTime(avFrame);
+            LOGE("休眠时间：%D",video->getDelayTime(diff)*1000);
+            av_usleep((unsigned int)(video->getDelayTime(diff) * 1000));
+
             //是yuv420p  渲染
             //回调数据
             LOGE("当前视频是yuv420p------");
-            video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,video->avCodecContext->height,
-                    avFrame->data[0],avFrame->data[1],avFrame->data[2]);
+            video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,
+                                               video->avCodecContext->height,
+                                               avFrame->data[0], avFrame->data[1],
+                                               avFrame->data[2]);
         } else {
             //转换成yuv420p
             AVFrame *pFrameYUV420P = av_frame_alloc();
@@ -132,10 +139,17 @@ void *playVide(void *data) {
                       pFrameYUV420P->linesize
             );
 
+            double diff = video->getFrameDiffTime(pFrameYUV420P);
+            LOGE("休眠时间：%D",video->getDelayTime(diff)*1000);
+            av_usleep((unsigned int)(video->getDelayTime(diff) * 1000));
+
             //回调数据
-            video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,video->avCodecContext->height,
-                                               pFrameYUV420P->data[0],pFrameYUV420P->data[1],pFrameYUV420P->data[2]);
+            video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,
+                                               video->avCodecContext->height,
+                                               pFrameYUV420P->data[0], pFrameYUV420P->data[1],
+                                               pFrameYUV420P->data[2]);
             LOGE("当前视频 不是yuv420p------");
+
             //渲染
             av_frame_free(&pFrameYUV420P);
             av_free(pFrameYUV420P);
@@ -189,4 +203,72 @@ void WlVideo::release() {
     }
 
 
+}
+
+//返回负数，视频比音频快；整数音频比视频快
+double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
+
+
+    double pts = av_frame_get_best_effort_timestamp(avFrame);
+    if(pts == AV_NOPTS_VALUE)
+    {
+        pts = 0;
+    }
+    pts *= av_q2d(time_base);
+
+    if(pts > 0)
+    {
+        clock = pts;
+    }
+
+    double diff = audio->clock - clock;
+    LOGE("defualtDelayTime:%f 音频的clock减去视频的clock的值是：%f   ", defualtDelayTime,diff);
+
+    return diff;
+}
+
+double WlVideo::getDelayTime(double diff) {
+
+    if(diff > 0.003)
+    {
+        delayTime = delayTime * 2 / 3;
+        if(delayTime < defualtDelayTime / 2)
+        {
+            delayTime = defualtDelayTime * 2 / 3;
+        }
+        else if(delayTime > defualtDelayTime * 2)
+        {
+            delayTime = defualtDelayTime * 2;
+        }
+    }
+    else if(diff < - 0.003)
+    {
+        delayTime = delayTime * 3 / 2;
+        if(delayTime < defualtDelayTime / 2)
+        {
+            delayTime = defualtDelayTime * 2 / 3;
+        }
+        else if(delayTime > defualtDelayTime * 2)
+        {
+            delayTime = defualtDelayTime * 2;
+        }
+    }
+    else if(diff == 0.003)
+    {
+
+    }
+    if(diff >= 0.5)
+    {
+        delayTime = 0;
+    }
+    else if(diff <= -0.5)
+    {
+        delayTime = defualtDelayTime * 2;
+    }
+
+    if(fabs(diff) >= 10)
+    {
+        delayTime = defualtDelayTime;
+    }
+    return delayTime;
 }

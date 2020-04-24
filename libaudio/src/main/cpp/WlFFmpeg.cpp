@@ -95,6 +95,14 @@ void WlFFmpeg::decodeFFmpegThread() {
                 video->streamIndex = i;
                 video->codecpar = pParameters;
                 video->time_base = pFormatCtx->streams[i]->time_base;
+
+                //处理音视频同步
+                int num = pFormatCtx->streams[i]->avg_frame_rate.num;
+                int den = pFormatCtx->streams[i]->avg_frame_rate.den;
+                if(num != 0 && den != 0){
+                    int fps=num/den;
+                    video->defualtDelayTime=1.0/fps;
+                }
             }
         }
 
@@ -120,6 +128,12 @@ void WlFFmpeg::start() {
         callJava->onCallError(CHILD_THREAD, 10007, "audio is null");
         return;
     }
+
+    if (video == NULL) {
+        callJava->onCallError(CHILD_THREAD, 10008, "video is null");
+    }
+
+    video->audio = audio;
 
     //调用播放
     audio->play();
