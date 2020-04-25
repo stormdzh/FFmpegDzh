@@ -35,6 +35,9 @@ public:
     double delayTime=0;
     double defualtDelayTime=0.004;
 
+    //seek线程锁
+    pthread_mutex_t codecMutex;
+
 
 public:
     WlVideo(WlPlayState *playState, WlCallJava *wlCallJava);

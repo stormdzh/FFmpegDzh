@@ -185,7 +185,10 @@ void WlFFmpeg::start() {
                     av_usleep(1000 * 100);
                     continue;
                 } else {
-                    playState->exit = true;
+                    if(!playState->isSeeking) {
+                        av_usleep(1000 * 500);
+                        playState->exit = true;
+                    }
                     break;
                 }
             }
@@ -292,20 +295,33 @@ void WlFFmpeg::seek(int64_t secds) {
     }
     if (secds >= 0 && secds <= duration) {
 
+        playState->isSeeking = true;
+        pthread_mutex_lock(&seek_mutex);
+        int64_t rel = secds * AV_TIME_BASE;
+        avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT64_MAX, 0);
+
         if (audio != NULL) {
-            playState->isSeeking = true;
+
             audio->queue->clearAvpacket();
             audio->clock = 0;
             audio->last_time = 0;
-
-            pthread_mutex_lock(&seek_mutex);
-            int64_t rel = secds * AV_TIME_BASE;
             //去掉解码器中缓存的文件
+            pthread_mutex_lock(&audio->codecMutex);
             avcodec_flush_buffers(audio->avCodecContext);
-            avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT64_MAX, 0);
-            pthread_mutex_unlock(&seek_mutex);
-            playState->isSeeking = false;
+            pthread_mutex_unlock(&audio->codecMutex);
         }
+
+        if(video!=NULL){
+            video->queue->clearAvpacket();
+            video->clock=0;
+            //去掉解码器中缓存的文件
+            pthread_mutex_lock(&video->codecMutex);
+            avcodec_flush_buffers(video->avCodecContext);
+            pthread_mutex_unlock(&video->codecMutex);
+
+        }
+        pthread_mutex_unlock(&seek_mutex);
+        playState->isSeeking = false;
     }
 }
 

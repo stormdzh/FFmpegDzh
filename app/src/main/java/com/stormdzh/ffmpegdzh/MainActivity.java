@@ -37,6 +37,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private WLGLSufurfaceView wlglSufurfaceView;
 
+    public boolean isSeek = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.btnOpenGLES).setOnClickListener(this);
 
 
-
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean isfromUser) {
@@ -89,7 +90,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                isSeek = true;
             }
 
             @Override
@@ -100,6 +101,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     Log.i(TAG, "seek 时间：" + seekto);
                     mTestJni.seekto(seekto);
                 }
+
+                isSeek = false;
             }
         });
 
@@ -139,6 +142,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     public void run() {
                         double per = ((double) curtime / (double) duration) * 100;
                         tvProgress.setText("当前播放进度:" + curtime + "/" + duration + "  百分比：" + ((int) per) + "%");
+                        if(!isSeek&&duration>0){
+                            mSeekBar.setProgress((int) per);
+                        }
                     }
                 });
             }
@@ -277,7 +283,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnStartRecord:
                 File outFile = new File(Environment.getExternalStorageDirectory(), "pcmToAac.aac");
-                if(outFile.exists()){
+                if (outFile.exists()) {
                     outFile.delete();
                 }
                 mTestJni.startRecord(outFile);
@@ -297,7 +303,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 mTestJni.setPlayerPrepareListener(new PlayerPrepareListener() {
                     @Override
                     public void onPrepared() {
-                        mTestJni.mCutAudioPlay(20,40,true);
+                        mTestJni.mCutAudioPlay(20, 40, true);
                     }
                 });
                 mTestJni.mprepare();
@@ -306,7 +312,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             case R.id.btnOpenGLES:
 
-                startActivity(new Intent(this,TestOpenGlesActivity.class));
+                startActivity(new Intent(this, TestOpenGlesActivity.class));
                 break;
         }
     }

@@ -9,10 +9,12 @@ WlVideo::WlVideo(WlPlayState *playState, WlCallJava *wlCallJava) {
     this->playState = playState;
     this->wlCallJava = wlCallJava;
     queue = new WlQueue(playState);
+    pthread_mutex_init(&codecMutex,NULL);
 }
 
 WlVideo::~WlVideo() {
 
+    pthread_mutex_destroy(&codecMutex);
 }
 
 void *playVide(void *data) {
@@ -61,10 +63,12 @@ void *playVide(void *data) {
             continue;
         }
 
+        pthread_mutex_lock(&video->codecMutex);
         if (avcodec_send_packet(video->avCodecContext, avPacket) != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
+            pthread_mutex_unlock(&video->codecMutex);
             continue;
         }
 
@@ -80,6 +84,7 @@ void *playVide(void *data) {
             av_free(avPacket);
             avPacket = NULL;
             av_usleep(1000 * 100);
+            pthread_mutex_unlock(&video->codecMutex);
             continue;
         }
 
@@ -130,7 +135,7 @@ void *playVide(void *data) {
                     av_free(pFrameYUV420P);
                     pFrameYUV420P = NULL;
                 }
-
+                pthread_mutex_unlock(&video->codecMutex);
                 continue;
             }
 
@@ -174,6 +179,8 @@ void *playVide(void *data) {
         av_free(avPacket);
         avPacket = NULL;
 
+        pthread_mutex_unlock(&video->codecMutex);
+
     }
 
 
@@ -193,9 +200,11 @@ void WlVideo::release() {
     }
 
     if (avCodecContext != NULL) {
+        pthread_mutex_lock(&codecMutex);
         avcodec_close(avCodecContext);
         avcodec_free_context(&avCodecContext);
         avCodecContext = NULL;
+        pthread_mutex_unlock(&codecMutex);
     }
 
 

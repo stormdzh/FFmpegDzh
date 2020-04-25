@@ -26,6 +26,8 @@ WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) 
     this->endTime = 0;
     this->isCut = false;
 
+    pthread_mutex_init(&codecMutex,NULL);
+
 
 }
 
@@ -159,11 +161,14 @@ int WlAudio::resampleAudio(void **pcmBuf) {
                 continue;
             }
 
+            pthread_mutex_lock(&codecMutex);
+
             int code_avcodec_send_packet = avcodec_send_packet(avCodecContext, avPacket);
             if (code_avcodec_send_packet != 0) {
                 av_packet_free(&avPacket);
                 av_free(avPacket);
                 avPacket = NULL;
+                pthread_mutex_unlock(&codecMutex);
                 continue;
             }
         }
@@ -208,6 +213,8 @@ int WlAudio::resampleAudio(void **pcmBuf) {
                     avFrame = NULL;
                 }
                 readFrameFinised = true;
+
+                pthread_mutex_unlock(&codecMutex);
                 continue;
 
             }
@@ -245,6 +252,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
 
             swr_free(&swrContext);
             swrContext = NULL;
+            pthread_mutex_unlock(&codecMutex);
             break;
 
         } else {
@@ -257,6 +265,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
             av_frame_free(&avFrame);
             av_free(avFrame);
             avFrame = NULL;
+            pthread_mutex_unlock(&codecMutex);
             continue;
 
         }
@@ -548,9 +557,11 @@ void WlAudio::release() {
 
     //释放解码器上下文
     if (avCodecContext != NULL) {
+        pthread_mutex_lock(&codecMutex);
         avcodec_close(avCodecContext);
         avcodec_free_context(&avCodecContext);
         avCodecContext = NULL;
+        pthread_mutex_unlock(&codecMutex);
     }
 
     //释放创建的对象
@@ -572,7 +583,7 @@ void WlAudio::release() {
 }
 
 WlAudio::~WlAudio() {
-
+    pthread_mutex_destroy(&codecMutex);
 }
 
 void WlAudio::setVolume(int percent) {

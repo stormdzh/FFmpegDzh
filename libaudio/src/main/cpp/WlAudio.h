@@ -107,6 +107,9 @@ public:
     WlBufferQueue *bufferQueue;
     int defaultPcmSize=4096;
 
+    //seek线程锁
+    pthread_mutex_t codecMutex;
+
 
 
 public:
