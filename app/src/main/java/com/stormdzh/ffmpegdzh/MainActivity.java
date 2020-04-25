@@ -53,6 +53,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mSeekBar = findViewById(R.id.mSeekBar);
         mVolume = findViewById(R.id.mVolume);
         wlglSufurfaceView = findViewById(R.id.glSufurfaceView);
+        wlglSufurfaceView.setKeepScreenOn(true);
         mTestJni.setGLSufurfaceView(wlglSufurfaceView);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);

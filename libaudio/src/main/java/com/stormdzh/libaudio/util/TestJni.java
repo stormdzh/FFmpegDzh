@@ -2,8 +2,10 @@ package com.stormdzh.libaudio.util;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Surface;
 
 import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
+import com.stormdzh.libaudio.util.opengl.WlVideoRender;
 
 import java.io.File;
 
@@ -86,6 +88,7 @@ public class TestJni {
     }
 
     public void mStart() {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -148,6 +151,9 @@ public class TestJni {
     public void onCallComplete() {
         //错误停止视频，释放资源
         nstop();
+        if (mediaCodecVideo != null) {
+            mediaCodecVideo.release();
+        }
         if (mOnPlayEventListener != null) {
             mOnPlayEventListener.onComplete();
         }
@@ -257,41 +263,60 @@ public class TestJni {
     //------------------视频播放器-------------------------
 
     private WLGLSufurfaceView mWLGLSufurfaceView;
+    private Surface mSurface;
 
     public void setGLSufurfaceView(WLGLSufurfaceView glSufurfaceView) {
         this.mWLGLSufurfaceView = glSufurfaceView;
+
+        if (mediaCodecVideo == null) {
+            mediaCodecVideo = new MediaCodecVideo();
+        }
+        mediaCodecVideo.setmWLGLSufurfaceView(mWLGLSufurfaceView);
+
+        if(mWLGLSufurfaceView!=null) {
+            mWLGLSufurfaceView.getVideoRender().setOnSurfaceCreatedListener(new WlVideoRender.OnSurfaceCreatedListener() {
+                @Override
+                public void onSurfaceCreated(Surface surface) {
+                    if (mSurface == null) {
+                        mSurface = surface;
+                    }
+                    mediaCodecVideo.setmSurface(mSurface);
+                    Log.i("mediacodec_video", "onSurfaceCreated");
+                }
+            });
+        }
     }
 
     public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
 
         Log.i("DDD", "收到ffmpeg回调过来yuv数据 onCallRenderYUV");
         if (mWLGLSufurfaceView != null) {
+            mWLGLSufurfaceView.getVideoRender().setRenderType(WlVideoRender.RENDER_YUV);
             mWLGLSufurfaceView.setYUVData(width, height, y, u, v);
         }
     }
 
     //通过编码名称判断，是否支持硬解码
-    public boolean onCallIsSupportMediaCode(String ffCodeNama){
+    public boolean onCallIsSupportMediaCode(String ffCodeNama) {
         return WlVideoSupportUitl.isSupportCodec(ffCodeNama);
     }
 
     MediaCodecVideo mediaCodecVideo;
 
-    public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1){
+    public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1) {
 
-        if(mediaCodecVideo==null){
-            mediaCodecVideo=new MediaCodecVideo();
+        if(mediaCodecVideo!=null) {
+            mediaCodecVideo.initMediaCodec(codecName, width, height, csd_0, csd_1);
         }
-        mediaCodecVideo.initMediaCodec(codecName,width,height,csd_0,csd_1);
+        Log.i("mediacodec_video", "init mediacodec");
     }
 
-    public void decodeAvPackt(int size,byte[] packtData){
+    public void decodeAvPackt(int size, byte[] packtData) {
 
-        if(mediaCodecVideo!=null){
-            mediaCodecVideo.decodeAVPacket(size,packtData);
+        if (mediaCodecVideo != null) {
+            mediaCodecVideo.decodeAVPacket(size, packtData);
         }
     }
-
 
 
 }

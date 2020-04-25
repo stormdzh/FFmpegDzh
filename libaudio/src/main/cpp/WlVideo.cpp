@@ -79,6 +79,7 @@ void *playVide(void *data) {
                 double diff = video->getFrameDiffTime(NULL,avPacket);
                 LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
                 av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+
                 video->wlCallJava->onCallDecodeAvpackt(avPacket->size, avPacket->data);
 
                 av_packet_free(&avPacket);
@@ -87,7 +88,7 @@ void *playVide(void *data) {
             }
             avPacket = NULL;
 
-            break;
+//            break;
 
         } else if (video->codectype == CODEC_YUV) {
             LOGE("软解码packet");

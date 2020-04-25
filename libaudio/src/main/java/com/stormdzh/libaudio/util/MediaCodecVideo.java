@@ -5,6 +5,9 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
+import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
+import com.stormdzh.libaudio.util.opengl.WlVideoRender;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -16,7 +19,7 @@ public class MediaCodecVideo {
 
     private MediaFormat mediaFormat;
     private MediaCodec mediaCodec;
-    private Surface surface;
+    private Surface mSurface;
     private MediaCodec.BufferInfo info;
 
 
@@ -30,36 +33,38 @@ public class MediaCodecVideo {
      * @param csd_1
      */
     public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1) {
-        if (surface != null) {
+        Log.d("mediacodec_video", "初始化mediacodec");
+        if (mSurface != null) {
             try {
+                mWLGLSufurfaceView.getVideoRender().setRenderType(WlVideoRender.RENDER_MEDIACODEC);
                 String mime = WlVideoSupportUitl.findVideoCodecName(codecName);
                 mediaFormat = MediaFormat.createVideoFormat(mime, width, height);
                 mediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
                 mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd_0));
                 mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(csd_1));
-                Log.d("initMediaCodec", mediaFormat.toString());
+                Log.d("mediacodec_video", mediaFormat.toString());
                 mediaCodec = MediaCodec.createDecoderByType(mime);
 
-                mediaCodec.configure(mediaFormat, surface, null, 0);
+                info = new MediaCodec.BufferInfo();
+                mediaCodec.configure(mediaFormat, mSurface, null, 0);
                 mediaCodec.start();
-
+                Log.d("mediacodec_video", "初始化mediacodec成功");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-//            if(wlOnErrorListener != null)
-//            {
-//                wlOnErrorListener.onError(2001, "surface is null");
+            Log.d("mediacodec_video", "初始化mediacodec mSurface ==null");
+//            if (wlOnErrorListener != null) {
+//                wlOnErrorListener.onError(2001, "mSurface is null");
 //            }
         }
     }
 
     public void decodeAVPacket(int datasize, byte[] data) {
-        Log.i("decodeAVPacket", "decodeAVPacket size:" + datasize);
-        if (surface != null && mediaCodec != null && datasize > 0 && data != null) {
+        if (mSurface != null && datasize > 0 && data != null && mediaCodec != null) {
             int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
             if (intputBufferIndex >= 0) {
-                ByteBuffer byteBuffer = mediaCodec.getOutputBuffers()[intputBufferIndex];
+                ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
                 byteBuffer.clear();
                 byteBuffer.put(data);
                 mediaCodec.queueInputBuffer(intputBufferIndex, 0, datasize, 0, 0);
@@ -69,6 +74,35 @@ public class MediaCodecVideo {
                 mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
                 outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
             }
+        }
+    }
+
+    public void setmSurface(Surface surface) {
+        if (this.mSurface == null) {
+//            Log.i("mediacodec_video", "setmSurface 参数为空吗：" + (surface == null));
+            this.mSurface = surface;
+        }
+    }
+
+    private WLGLSufurfaceView mWLGLSufurfaceView;
+
+    public void setmWLGLSufurfaceView(WLGLSufurfaceView sufurfaceView) {
+        if (mWLGLSufurfaceView == null) {
+            Log.i("mediacodec_video", "setmWLGLSufurfaceView");
+            this.mWLGLSufurfaceView = sufurfaceView;
+        }
+    }
+
+
+    public void release() {
+        if (mediaCodec != null) {
+            Log.i("mediacodec_video", "release");
+            mediaCodec.flush();
+            mediaCodec.stop();
+            mediaCodec.release();
+            mediaCodec = null;
+            mediaFormat = null;
+            info = null;
         }
     }
 }

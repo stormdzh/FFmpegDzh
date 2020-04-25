@@ -3,6 +3,7 @@ package com.stormdzh.libaudio.util.opengl;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.view.Surface;
 
 /**
  * @Description: 描述
@@ -31,11 +32,23 @@ public class WLGLSufurfaceView extends GLSurfaceView {
         wlVideoRender = new WlVideoRender(getContext());
         setRenderer(wlVideoRender);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        //硬解码刷新数据
+        wlVideoRender.setOnRenderListener(new WlVideoRender.OnRenderListener() {
+            @Override
+            public void onRender() {
+                requestRender();
+            }
+        });
     }
 
     public void setYUVData(int width, int height, byte[] y, byte[] u, byte[] v) {
         if (wlVideoRender == null) return;
         wlVideoRender.setYUVRenderDataa(width, height, y, u, v);
         requestRender();
+    }
+
+    public WlVideoRender getVideoRender(){
+        return wlVideoRender;
     }
 }
