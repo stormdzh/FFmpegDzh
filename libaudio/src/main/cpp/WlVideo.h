@@ -37,7 +37,7 @@ public:
     WlAudio *audio=NULL;
     double clock=0;
     double delayTime=0;
-    double defualtDelayTime=0.004;
+    double defualtDelayTime=0.04;
 
     //seek线程锁
     pthread_mutex_t codecMutex;

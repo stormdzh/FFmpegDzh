@@ -205,7 +205,7 @@ void WlFFmpeg::start() {
             continue;
         }
         //控制缓存队列最多缓存40帧
-        if (audio->queue->getQueueSize() > 100) {
+        if (audio->queue->getQueueSize() > 400) {
             //休眠100毫秒
             av_usleep(1000 * 100);
             continue;
