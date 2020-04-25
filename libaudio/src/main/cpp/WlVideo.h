@@ -45,6 +45,8 @@ public:
     //解码方式标示 -默认使用软解码
     int codectype=CODEC_YUV;
 
+    AVBSFContext *abs_ctx=NULL;
+
 
 public:
     WlVideo(WlPlayState *playState, WlCallJava *wlCallJava);

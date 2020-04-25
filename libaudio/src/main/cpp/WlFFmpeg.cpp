@@ -99,9 +99,9 @@ void WlFFmpeg::decodeFFmpegThread() {
                 //处理音视频同步
                 int num = pFormatCtx->streams[i]->avg_frame_rate.num;
                 int den = pFormatCtx->streams[i]->avg_frame_rate.den;
-                if(num != 0 && den != 0){
-                    int fps=num/den;
-                    video->defualtDelayTime=1.0/fps;
+                if (num != 0 && den != 0) {
+                    int fps = num / den;
+                    video->defualtDelayTime = 1.0 / fps;
                 }
             }
         }
@@ -135,13 +135,50 @@ void WlFFmpeg::start() {
     video->audio = audio;
 
     //换区视频编码格式 例如 h264
-    const char* codecName=((const AVCodec*)video->avCodecContext->codec)->name;
-    if(callJava->onCallIsSupportMediaCode(codecName)){
+    const char *codecName = ((const AVCodec *) video->avCodecContext->codec)->name;
+    if (isSupporMediaCodec = callJava->onCallIsSupportMediaCode(codecName)) {
         LOGE("该视频支持硬解码");
-        video->codectype=CODEC_MEDIACODEC;
-    }else{
+
+        if (strcasecmp(codecName, "h264") == 0) {
+            bsfilter = const_cast<AVBitStreamFilter *>(av_bsf_get_by_name("h264_mp4toannexb"));
+        } else if (strcasecmp(codecName, "h265") == 0) {
+            bsfilter = const_cast<AVBitStreamFilter *>(av_bsf_get_by_name("hevc_mp4toannexb"));
+        }
+        //分配内存空间
+        if (bsfilter == NULL) {
+            isSupporMediaCodec = false;
+            goto end;
+        }
+        if (av_bsf_alloc(bsfilter, &video->abs_ctx) != 0) {
+            //不支持硬解码
+            isSupporMediaCodec = false;
+            goto end;
+        }
+        if (avcodec_parameters_copy(video->abs_ctx->par_in, video->codecpar) < 0) {
+            //失败
+            av_bsf_free(&video->abs_ctx);
+            video->abs_ctx=NULL;
+            isSupporMediaCodec = false;
+            goto end;
+        }
+        if (av_bsf_init(video->abs_ctx) != 0) {
+            av_bsf_free(&video->abs_ctx);
+            video->abs_ctx=NULL;
+            isSupporMediaCodec = false;
+            goto end;
+        }
+        video->abs_ctx->time_base_in=video->time_base;
+
+    } else {
         LOGE("该视频不支持硬解码");
-        video->codectype=CODEC_YUV;
+        video->codectype = CODEC_YUV;
+    }
+
+    end:
+    if (isSupporMediaCodec) {
+        video->codectype = CODEC_MEDIACODEC;
+    } else {
+        video->codectype = CODEC_YUV;
     }
 
     //调用播放
@@ -194,7 +231,7 @@ void WlFFmpeg::start() {
                     av_usleep(1000 * 100);
                     continue;
                 } else {
-                    if(!playState->isSeeking) {
+                    if (!playState->isSeeking) {
                         av_usleep(1000 * 500);
                         playState->exit = true;
                     }
@@ -224,8 +261,8 @@ void WlFFmpeg::start() {
 }
 
 void WlFFmpeg::pause() {
-    if(playState!=NULL){
-        playState->pause=true;
+    if (playState != NULL) {
+        playState->pause = true;
     }
     if (audio != NULL) {
         audio->pause();
@@ -235,8 +272,8 @@ void WlFFmpeg::pause() {
 
 void WlFFmpeg::resume() {
 
-    if(playState!=NULL){
-        playState->pause= false;
+    if (playState != NULL) {
+        playState->pause = false;
     }
 
     if (audio != NULL) {
@@ -320,9 +357,9 @@ void WlFFmpeg::seek(int64_t secds) {
             pthread_mutex_unlock(&audio->codecMutex);
         }
 
-        if(video!=NULL){
+        if (video != NULL) {
             video->queue->clearAvpacket();
-            video->clock=0;
+            video->clock = 0;
             //去掉解码器中缓存的文件
             pthread_mutex_lock(&video->codecMutex);
             avcodec_flush_buffers(video->avCodecContext);

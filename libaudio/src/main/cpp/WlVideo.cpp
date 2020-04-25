@@ -9,7 +9,7 @@ WlVideo::WlVideo(WlPlayState *playState, WlCallJava *wlCallJava) {
     this->playState = playState;
     this->wlCallJava = wlCallJava;
     queue = new WlQueue(playState);
-    pthread_mutex_init(&codecMutex,NULL);
+    pthread_mutex_init(&codecMutex, NULL);
 }
 
 WlVideo::~WlVideo() {
@@ -64,16 +64,28 @@ void *playVide(void *data) {
         }
 
         //这里获取到解码的package了-判断使用硬解码还是软解码
-        if(video->codectype==CODEC_MEDIACODEC){
+        if (video->codectype == CODEC_MEDIACODEC) {
             LOGE("硬解码packet");
 
-            av_packet_free(&avPacket);
-            av_free(avPacket);
+            if (av_bsf_send_packet(video->abs_ctx, avPacket) != 0) {
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                avPacket = NULL;
+                continue;
+            }
+            while (av_bsf_receive_packet(video->abs_ctx, avPacket) == 0) {
+                //开始解码
+                LOGE("开始硬解码");
+
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                continue;
+            }
             avPacket = NULL;
 
             break;
 
-        }else if(video->codectype==CODEC_YUV){
+        } else if (video->codectype == CODEC_YUV) {
             LOGE("软解码packet");
 
             //一下是软解码的代码
@@ -107,8 +119,8 @@ void *playVide(void *data) {
             if (avFrame->format = AV_PIX_FMT_YUV420P) {
 
                 double diff = video->getFrameDiffTime(avFrame);
-                LOGE("休眠时间：%D",video->getDelayTime(diff)*1000);
-                av_usleep((unsigned int)(video->getDelayTime(diff) * 1000));
+                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
+                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
 
                 //是yuv420p  渲染
                 //回调数据
@@ -164,8 +176,8 @@ void *playVide(void *data) {
                 );
 
                 double diff = video->getFrameDiffTime(pFrameYUV420P);
-                LOGE("休眠时间：%D",video->getDelayTime(diff)*1000);
-                av_usleep((unsigned int)(video->getDelayTime(diff) * 1000));
+                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
+                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
 
                 //回调数据
                 video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,
@@ -215,6 +227,11 @@ void WlVideo::release() {
         queue = NULL;
     }
 
+    if (abs_ctx != NULL) {
+        av_bsf_free(&abs_ctx);
+        abs_ctx = NULL;
+    }
+
     if (avCodecContext != NULL) {
         pthread_mutex_lock(&codecMutex);
         avcodec_close(avCodecContext);
@@ -240,64 +257,47 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
 
 
     double pts = av_frame_get_best_effort_timestamp(avFrame);
-    if(pts == AV_NOPTS_VALUE)
-    {
+    if (pts == AV_NOPTS_VALUE) {
         pts = 0;
     }
     pts *= av_q2d(time_base);
 
-    if(pts > 0)
-    {
+    if (pts > 0) {
         clock = pts;
     }
 
     double diff = audio->clock - clock;
-    LOGE("defualtDelayTime:%f 音频的clock减去视频的clock的值是：%f   ", defualtDelayTime,diff);
+    LOGE("defualtDelayTime:%f 音频的clock减去视频的clock的值是：%f   ", defualtDelayTime, diff);
 
     return diff;
 }
 
 double WlVideo::getDelayTime(double diff) {
 
-    if(diff > 0.003)
-    {
+    if (diff > 0.003) {
         delayTime = delayTime * 2 / 3;
-        if(delayTime < defualtDelayTime / 2)
-        {
+        if (delayTime < defualtDelayTime / 2) {
             delayTime = defualtDelayTime * 2 / 3;
-        }
-        else if(delayTime > defualtDelayTime * 2)
-        {
+        } else if (delayTime > defualtDelayTime * 2) {
             delayTime = defualtDelayTime * 2;
         }
-    }
-    else if(diff < - 0.003)
-    {
+    } else if (diff < -0.003) {
         delayTime = delayTime * 3 / 2;
-        if(delayTime < defualtDelayTime / 2)
-        {
+        if (delayTime < defualtDelayTime / 2) {
             delayTime = defualtDelayTime * 2 / 3;
-        }
-        else if(delayTime > defualtDelayTime * 2)
-        {
+        } else if (delayTime > defualtDelayTime * 2) {
             delayTime = defualtDelayTime * 2;
         }
-    }
-    else if(diff == 0.003)
-    {
+    } else if (diff == 0.003) {
 
     }
-    if(diff >= 0.5)
-    {
+    if (diff >= 0.5) {
         delayTime = 0;
-    }
-    else if(diff <= -0.5)
-    {
+    } else if (diff <= -0.5) {
         delayTime = defualtDelayTime * 2;
     }
 
-    if(fabs(diff) >= 10)
-    {
+    if (fabs(diff) >= 10) {
         delayTime = defualtDelayTime;
     }
     return delayTime;

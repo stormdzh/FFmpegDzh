@@ -38,6 +38,11 @@ public:
     //视频相关
     WlVideo *video = NULL;
 
+    //硬解码使用
+    AVBitStreamFilter *bsfilter = NULL;
+
+    bool isSupporMediaCodec=false;
+
 public:
 
     WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url);
@@ -69,7 +74,7 @@ public:
     bool cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data);
 
     //视频相关
-    int getCodecContext(AVCodecParameters *codecpar,AVCodecContext **avCodecContext );
+    int getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext);
 };
 
 #endif //FFMPEGDZH_WLFFMPEG_H
