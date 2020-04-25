@@ -283,9 +283,12 @@ int WlAudio::getSoundTouchData() {
         if (finished) {
             finished = false;
             data_size = resampleAudio(reinterpret_cast<void **>(&out_buffer));
+            LOGE("22222222222  data_size:%d",data_size);
             if (data_size > 0) {
                 for (int i = 0; i < data_size / 2 + 1; i++) {
-                    sampleBuffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                    if(sampleBuffer!=NULL&&out_buffer!=NULL) {
+                        sampleBuffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                    }
                 }
                 soundTouch->putSamples(sampleBuffer, nb);
                 sound_touch_nb = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
