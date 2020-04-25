@@ -132,8 +132,17 @@ void WlFFmpeg::start() {
     if (video == NULL) {
         callJava->onCallError(CHILD_THREAD, 10008, "video is null");
     }
-
     video->audio = audio;
+
+    //换区视频编码格式 例如 h264
+    const char* codecName=((const AVCodec*)video->avCodecContext->codec)->name;
+    if(callJava->onCallIsSupportMediaCode(codecName)){
+        LOGE("该视频支持硬解码");
+        video->codectype=CODEC_MEDIACODEC;
+    }else{
+        LOGE("该视频不支持硬解码");
+        video->codectype=CODEC_YUV;
+    }
 
     //调用播放
     audio->play();

@@ -63,6 +63,20 @@ void *playVide(void *data) {
             continue;
         }
 
+        //这里获取到解码的package了-判断使用硬解码还是软解码
+        if(video->codectype==CODEC_MEDIACODEC){
+            LOGE("硬解码packet");
+
+            av_packet_free(&avPacket);
+            av_free(avPacket);
+            avPacket = NULL;
+
+            break;
+
+        }else if(video->codectype==CODEC_YUV){
+            LOGE("软解码packet");
+        }
+        //一下是软解码的代码
         pthread_mutex_lock(&video->codecMutex);
         if (avcodec_send_packet(video->avCodecContext, avPacket) != 0) {
             av_packet_free(&avPacket);

@@ -26,6 +26,8 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
     jmid_pcmtoaac = jniEnv->GetMethodID(jlz, "encodecPcmToAAc", "(I[B)V");
     jmid_pcminfo = jniEnv->GetMethodID(jlz, "onCallPcmInfo", "([BI)V");
     jmid_renderyuv = jniEnv->GetMethodID(jlz, "onCallRenderYUV", "(II[B[B[B)V");
+    jmid_supportMediaCodec = jniEnv->GetMethodID(jlz, "onCallIsSupportMediaCode",
+                                                 "(Ljava/lang/String;)Z");
 }
 
 void WlCallJava::onCallPrepare(int type) {
@@ -196,5 +198,22 @@ void WlCallJava::onCallRenderYUV(int width, int height, uint8_t *fy, uint8_t *fu
 
     javaVm->DetachCurrentThread();
 
+}
+
+bool WlCallJava::onCallIsSupportMediaCode(const char *ffcodecname) {
+
+    JNIEnv *jniEnv;
+    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+        LOGE("call onCallComplete worng");
+        return false;
+    }
+
+    bool support = false;
+
+    jstring codecName = jniEnv->NewStringUTF(ffcodecname);
+    support = jniEnv->CallBooleanMethod(jobj, jmid_supportMediaCodec, codecName);
+    jniEnv->DeleteLocalRef(codecName);
+    javaVm->DetachCurrentThread();
+    return support;
 }
 

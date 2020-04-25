@@ -270,5 +270,10 @@ public class TestJni {
         }
     }
 
+    //通过编码名称判断，是否支持硬解码
+    public boolean onCallIsSupportMediaCode(String ffCodeNama){
+        return WlVideoSupportUitl.isSupportCodec(ffCodeNama);
+    }
+
 
 }

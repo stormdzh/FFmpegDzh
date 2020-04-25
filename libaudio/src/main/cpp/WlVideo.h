@@ -9,6 +9,10 @@
 #include "WlCallJava.h"
 #include "WlAudio.h"
 
+
+#define CODEC_YUV 0
+#define CODEC_MEDIACODEC 1
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/time.h>
@@ -37,6 +41,9 @@ public:
 
     //seek线程锁
     pthread_mutex_t codecMutex;
+
+    //解码方式标示 -默认使用软解码
+    int codectype=CODEC_YUV;
 
 
 public:
