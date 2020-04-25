@@ -275,5 +275,23 @@ public class TestJni {
         return WlVideoSupportUitl.isSupportCodec(ffCodeNama);
     }
 
+    MediaCodecVideo mediaCodecVideo;
+
+    public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1){
+
+        if(mediaCodecVideo==null){
+            mediaCodecVideo=new MediaCodecVideo();
+        }
+        mediaCodecVideo.initMediaCodec(codecName,width,height,csd_0,csd_1);
+    }
+
+    public void decodeAvPackt(int size,byte[] packtData){
+
+        if(mediaCodecVideo!=null){
+            mediaCodecVideo.decodeAVPacket(size,packtData);
+        }
+    }
+
+
 
 }

@@ -58,7 +58,7 @@ public:
     void release();
 
     //获取音频进度和视频进度差值
-    double getFrameDiffTime(AVFrame *avFrame);
+    double getFrameDiffTime(AVFrame *avFrame,AVPacket *avPacket);
     //获取视频需要延迟的时间
     double getDelayTime(double diff);
 };

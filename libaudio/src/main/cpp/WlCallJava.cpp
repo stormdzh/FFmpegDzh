@@ -28,6 +28,8 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
     jmid_renderyuv = jniEnv->GetMethodID(jlz, "onCallRenderYUV", "(II[B[B[B)V");
     jmid_supportMediaCodec = jniEnv->GetMethodID(jlz, "onCallIsSupportMediaCode",
                                                  "(Ljava/lang/String;)Z");
+    jmid_initMediaCodec = jniEnv->GetMethodID(jlz, "initMediaCodec", "(Ljava/lang/String;II[B[B)V");
+    jmid_decodeavpackt = jniEnv->GetMethodID(jlz, "decodeAvPackt", "(I[B)V");
 }
 
 void WlCallJava::onCallPrepare(int type) {
@@ -215,5 +217,46 @@ bool WlCallJava::onCallIsSupportMediaCode(const char *ffcodecname) {
     jniEnv->DeleteLocalRef(codecName);
     javaVm->DetachCurrentThread();
     return support;
+}
+
+void WlCallJava::onCallInitMediaCodec(const char* mine,int width, int height, int csd0_size,uint8_t* csd_0,int csd1_size, uint8_t* csd_1) {
+    JNIEnv *jniEnv;
+    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+        LOGE("call onCallComplete worng");
+        return ;
+    }
+
+    jstring type=jniEnv->NewStringUTF(mine);
+
+    jbyteArray csd0 = jniEnv->NewByteArray(csd0_size);
+    jniEnv->SetByteArrayRegion(csd0, 0, csd0_size, reinterpret_cast<const jbyte *>(csd_0));
+
+    jbyteArray csd1 = jniEnv->NewByteArray(csd1_size);
+    jniEnv->SetByteArrayRegion(csd1, 0, csd0_size, reinterpret_cast<const jbyte *>(csd_1));
+
+    jniEnv->CallVoidMethod(jobj, jmid_initMediaCodec, type,width, height, csd0, csd1);
+
+    jniEnv->DeleteLocalRef(type);
+    jniEnv->DeleteLocalRef(csd0);
+    jniEnv->DeleteLocalRef(csd1);
+    javaVm->DetachCurrentThread();
+
+}
+
+void WlCallJava::onCallDecodeAvpackt(int datasize, uint8_t *packtdata) {
+
+    JNIEnv *jniEnv;
+    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+        LOGE("call onCallComplete worng");
+        return ;
+    }
+
+    jbyteArray data = jniEnv->NewByteArray(datasize);
+    jniEnv->SetByteArrayRegion(data, 0, datasize, reinterpret_cast<const jbyte *>(packtdata));
+
+    jniEnv->CallVoidMethod(jobj, jmid_decodeavpackt, datasize,data);
+
+    jniEnv->DeleteLocalRef(data);
+    javaVm->DetachCurrentThread();
 }
 

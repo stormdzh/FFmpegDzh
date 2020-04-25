@@ -27,6 +27,8 @@ public:
     jmethodID jmid_pcminfo;
     jmethodID jmid_renderyuv;
     jmethodID jmid_supportMediaCodec;
+    jmethodID jmid_initMediaCodec;
+    jmethodID jmid_decodeavpackt;
 
 public:
     WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *jobj);
@@ -50,6 +52,10 @@ public:
     void onCallRenderYUV(int width,int height,uint8_t *fy,uint8_t *fu,uint8_t *fv);
 
     bool onCallIsSupportMediaCode(const char* ffcodecname);
+
+    void onCallInitMediaCodec(const char* mine,int width,int heght,int csd0_size,uint8_t* csd_0,int csd1_size,uint8_t* csd_1);
+
+    void onCallDecodeAvpackt(int datasize,uint8_t* avpacktdata);
 
 
 };

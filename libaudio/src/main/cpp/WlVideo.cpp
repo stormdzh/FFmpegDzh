@@ -76,6 +76,10 @@ void *playVide(void *data) {
             while (av_bsf_receive_packet(video->abs_ctx, avPacket) == 0) {
                 //开始解码
                 LOGE("开始硬解码");
+                double diff = video->getFrameDiffTime(NULL,avPacket);
+                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
+                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+                video->wlCallJava->onCallDecodeAvpackt(avPacket->size, avPacket->data);
 
                 av_packet_free(&avPacket);
                 av_free(avPacket);
@@ -118,7 +122,7 @@ void *playVide(void *data) {
 
             if (avFrame->format = AV_PIX_FMT_YUV420P) {
 
-                double diff = video->getFrameDiffTime(avFrame);
+                double diff = video->getFrameDiffTime(avFrame,NULL);
                 LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
                 av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
 
@@ -175,7 +179,7 @@ void *playVide(void *data) {
                           pFrameYUV420P->linesize
                 );
 
-                double diff = video->getFrameDiffTime(pFrameYUV420P);
+                double diff = video->getFrameDiffTime(pFrameYUV420P,NULL);
                 LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
                 av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
 
@@ -253,10 +257,15 @@ void WlVideo::release() {
 }
 
 //返回负数，视频比音频快；整数音频比视频快
-double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
+double WlVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
+    double pts = 0;
+    if (avFrame != NULL) {
+        pts = av_frame_get_best_effort_timestamp(avFrame);
+    } else if (avPacket != NULL) {
+        pts = avPacket->pts;
+    }
 
 
-    double pts = av_frame_get_best_effort_timestamp(avFrame);
     if (pts == AV_NOPTS_VALUE) {
         pts = 0;
     }

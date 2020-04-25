@@ -157,17 +157,17 @@ void WlFFmpeg::start() {
         if (avcodec_parameters_copy(video->abs_ctx->par_in, video->codecpar) < 0) {
             //失败
             av_bsf_free(&video->abs_ctx);
-            video->abs_ctx=NULL;
+            video->abs_ctx = NULL;
             isSupporMediaCodec = false;
             goto end;
         }
         if (av_bsf_init(video->abs_ctx) != 0) {
             av_bsf_free(&video->abs_ctx);
-            video->abs_ctx=NULL;
+            video->abs_ctx = NULL;
             isSupporMediaCodec = false;
             goto end;
         }
-        video->abs_ctx->time_base_in=video->time_base;
+        video->abs_ctx->time_base_in = video->time_base;
 
     } else {
         LOGE("该视频不支持硬解码");
@@ -177,6 +177,14 @@ void WlFFmpeg::start() {
     end:
     if (isSupporMediaCodec) {
         video->codectype = CODEC_MEDIACODEC;
+        video->wlCallJava->onCallInitMediaCodec(codecName,
+                                                video->avCodecContext->width,
+                                                video->avCodecContext->height,
+                                                video->avCodecContext->extradata_size,
+                                                video->avCodecContext->extradata,
+                                                video->avCodecContext->extradata_size,
+                                                video->avCodecContext->extradata
+        );
     } else {
         video->codectype = CODEC_YUV;
     }
