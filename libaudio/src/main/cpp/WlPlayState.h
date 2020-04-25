@@ -10,6 +10,8 @@ public:
     bool exit;
     bool load = true;
     bool isSeeking= false; //正在seek，停止解码
+    //暂停
+    bool pause=false;
 public:
     WlPlayState();
     ~WlPlayState();

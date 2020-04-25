@@ -212,6 +212,9 @@ void WlFFmpeg::start() {
 }
 
 void WlFFmpeg::pause() {
+    if(playState!=NULL){
+        playState->pause=true;
+    }
     if (audio != NULL) {
         audio->pause();
     }
@@ -219,6 +222,11 @@ void WlFFmpeg::pause() {
 }
 
 void WlFFmpeg::resume() {
+
+    if(playState!=NULL){
+        playState->pause= false;
+    }
+
     if (audio != NULL) {
         audio->resume();
     }

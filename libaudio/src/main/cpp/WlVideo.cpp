@@ -30,6 +30,11 @@ void *playVide(void *data) {
             continue;
         }
 
+        if (video->playState->pause) {
+            av_usleep(1000 * 100);
+            continue;
+        }
+
         if (video->queue->getQueueSize() == 0) {
             if (!video->playState->load) {
                 video->playState->load = true;
