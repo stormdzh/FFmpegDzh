@@ -161,6 +161,9 @@ public class TestJni {
 
     public void stop() {
         nstop();
+        if (mediaCodecVideo != null) {
+            mediaCodecVideo.release();
+        }
     }
 
     public native void nstop();
@@ -299,7 +302,7 @@ public class TestJni {
     //通过编码名称判断，是否支持硬解码
     public boolean onCallIsSupportMediaCode(String ffCodeNama) {
         Log.i("mediacodec_video","视频编码名称："+ffCodeNama);
-        return WlVideoSupportUitl.isSupportCodec(ffCodeNama)&&false;
+        return WlVideoSupportUitl.isSupportCodec(ffCodeNama);
     }
 
     MediaCodecVideo mediaCodecVideo;

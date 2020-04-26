@@ -37,7 +37,8 @@ void *decodePlay(void *data) {
     WlAudio *wlaudio = static_cast<WlAudio *>(data);
 //    wlaudio->resampleAudio();
     wlaudio->initOpenSLES();
-    pthread_exit(&wlaudio->playThread);
+//    pthread_exit(&wlaudio->playThread);
+    return 0;
 }
 
 void *pcmCallBack(void *data) {
@@ -112,6 +113,7 @@ void *pcmCallBack(void *data) {
     }
 
     pthread_exit(&audio->pcmCallbackThread);
+//    return 0;
 
 }
 
@@ -119,8 +121,11 @@ void *pcmCallBack(void *data) {
 
 void WlAudio::play() {
 
-    pthread_create(&playThread, NULL, decodePlay, this);
-    pthread_create(&pcmCallbackThread, NULL, pcmCallBack, this);
+    if(playState!=NULL&&!playState->exit) {
+        pthread_create(&playThread, NULL, decodePlay, this);
+        pthread_create(&pcmCallbackThread, NULL, pcmCallBack, this);
+    }
+
 
 }
 
@@ -510,6 +515,11 @@ void WlAudio::stop() {
 void WlAudio::release() {
     //停止音频
     stop();
+    if(queue!=NULL){
+        queue->notifyQueue();
+    }
+//    pthread_join(pcmCallbackThread,NULL);
+    pthread_join(playThread,NULL);
     //释放队列
     if (queue != NULL) {
         delete (queue);

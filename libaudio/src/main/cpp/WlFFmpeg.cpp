@@ -17,7 +17,8 @@ void *decodeFFmpeg(void *data) {
 
     WlFFmpeg *wlFFmpeg = (WlFFmpeg *) data;
     wlFFmpeg->decodeFFmpegThread();
-    pthread_exit(&wlFFmpeg->decodeThread);
+//    pthread_exit(&wlFFmpeg->decodeThread);
+    return 0;
 }
 
 void WlFFmpeg::prepare() {
@@ -294,6 +295,7 @@ void WlFFmpeg::release() {
         return;
     }
     playState->exit = true;
+    pthread_join(decodeThread,NULL);
 
     pthread_mutex_lock(&init_mutex);
 

@@ -75,4 +75,8 @@ void WlQueue::clearAvpacket() {
 
 }
 
+void WlQueue::notifyQueue() {
+    pthread_cond_signal(&countPacket);
+}
+
 

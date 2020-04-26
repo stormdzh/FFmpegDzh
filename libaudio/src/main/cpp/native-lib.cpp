@@ -254,7 +254,9 @@ void *startCallback(void *data) {
     if (fFmpeg != NULL) {
         fFmpeg->start();
     }
-    pthread_exit(&thread_start);
+//    pthread_exit(&thread_start);
+    return 0;
+
 }
 
 extern "C"
@@ -298,6 +300,7 @@ Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
     nativeExit = false;
     if (mFFmpeg != NULL) {
         mFFmpeg->release();
+        pthread_join(thread_start,NULL);
         delete (mFFmpeg);
         mFFmpeg = NULL;
 

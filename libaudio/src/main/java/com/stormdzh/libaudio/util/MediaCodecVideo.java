@@ -62,17 +62,21 @@ public class MediaCodecVideo {
 
     public void decodeAVPacket(int datasize, byte[] data) {
         if (mSurface != null && datasize > 0 && data != null && mediaCodec != null) {
-            int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
-            if (intputBufferIndex >= 0) {
-                ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
-                byteBuffer.clear();
-                byteBuffer.put(data);
-                mediaCodec.queueInputBuffer(intputBufferIndex, 0, datasize, 0, 0);
-            }
-            int outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
-            while (outputBufferIndex >= 0) {
-                mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
-                outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
+            try {
+                int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
+                if (intputBufferIndex >= 0) {
+                    ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
+                    byteBuffer.clear();
+                    byteBuffer.put(data);
+                    mediaCodec.queueInputBuffer(intputBufferIndex, 0, datasize, 0, 0);
+                }
+                int outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
+                while (outputBufferIndex >= 0) {
+                    mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
+                    outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -97,9 +101,13 @@ public class MediaCodecVideo {
     public void release() {
         if (mediaCodec != null) {
             Log.i("mediacodec_video", "release");
-            mediaCodec.flush();
-            mediaCodec.stop();
-            mediaCodec.release();
+            try {
+                mediaCodec.flush();
+                mediaCodec.stop();
+                mediaCodec.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             mediaCodec = null;
             mediaFormat = null;
             info = null;
