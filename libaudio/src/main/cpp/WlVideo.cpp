@@ -55,7 +55,7 @@ void *playVide(void *data) {
         AVPacket *avPacket = av_packet_alloc();
 
         if (video->queue->getAvPacket(avPacket) != 0) {
-            LOGE("没有拿到AVPacket");
+            LOGDV("没有拿到AVPacket");
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -65,7 +65,7 @@ void *playVide(void *data) {
 
         //这里获取到解码的package了-判断使用硬解码还是软解码
         if (video->codectype == CODEC_MEDIACODEC) {
-            LOGE("硬解码packet");
+            LOGDV("硬解码packet");
 
             if (av_bsf_send_packet(video->abs_ctx, avPacket) != 0) {
                 av_packet_free(&avPacket);
@@ -75,10 +75,10 @@ void *playVide(void *data) {
             }
             while (av_bsf_receive_packet(video->abs_ctx, avPacket) == 0) {
                 //开始解码
-                LOGE("开始硬解码");
-                double diff = video->getFrameDiffTime(NULL,avPacket);
-                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
-                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+                LOGDV("开始硬解码");
+                double diff = video->getFrameDiffTime(NULL, avPacket);
+//                LOGDV("休眠时间：%D", video->getDelayTime(diff) * 1000);
+                av_usleep(video->getDelayTime(diff) * 1000000);
 
                 video->wlCallJava->onCallDecodeAvpackt(avPacket->size, avPacket->data);
 
@@ -91,7 +91,7 @@ void *playVide(void *data) {
 //            break;
 
         } else if (video->codectype == CODEC_YUV) {
-            LOGE("软解码packet");
+//            LOGDV("软解码packet");
 
             //一下是软解码的代码
             pthread_mutex_lock(&video->codecMutex);
@@ -119,17 +119,18 @@ void *playVide(void *data) {
                 continue;
             }
 
-            LOGE("子线程解码到avframe成功");
+//            LOGDV("子线程解码到avframe成功");
 
             if (avFrame->format = AV_PIX_FMT_YUV420P) {
 
-                double diff = video->getFrameDiffTime(avFrame,NULL);
-                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
-                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+                double diff = video->getFrameDiffTime(avFrame, NULL);
+                LOGDV("休眠时间：%D", video->getDelayTime(diff) * 1000);
+//                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+                av_usleep(video->getDelayTime(diff) * 1000000);
 
                 //是yuv420p  渲染
                 //回调数据
-                LOGE("当前视频是yuv420p------");
+//                LOGDV("当前视频是yuv420p------");
                 video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,
                                                    video->avCodecContext->height,
                                                    avFrame->data[0], avFrame->data[1],
@@ -180,16 +181,18 @@ void *playVide(void *data) {
                           pFrameYUV420P->linesize
                 );
 
-                double diff = video->getFrameDiffTime(pFrameYUV420P,NULL);
-                LOGE("休眠时间：%D", video->getDelayTime(diff) * 1000);
-                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+//                double diff = video->getFrameDiffTime(pFrameYUV420P, NULL);
+                double diff = video->getFrameDiffTime(avFrame, NULL);
+                LOGDV("非yuv 休眠时间：%D", video->getDelayTime(diff) * 1000000);
+//                av_usleep((unsigned int) (video->getDelayTime(diff) * 1000));
+                av_usleep(video->getDelayTime(diff) * 1000000);
 
                 //回调数据
                 video->wlCallJava->onCallRenderYUV(video->avCodecContext->width,
                                                    video->avCodecContext->height,
                                                    pFrameYUV420P->data[0], pFrameYUV420P->data[1],
                                                    pFrameYUV420P->data[2]);
-                LOGE("当前视频 不是yuv420p------");
+//                LOGDV("当前视频 不是yuv420p------");
 
                 //渲染
                 av_frame_free(&pFrameYUV420P);
@@ -262,7 +265,7 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     double pts = 0;
     if (avFrame != NULL) {
 //        pts = av_frame_get_best_effort_timestamp(avFrame);
-        pts=avFrame->pts;
+        pts = avFrame->pts;
     } else if (avPacket != NULL) {
         pts = avPacket->pts;
     }
@@ -278,7 +281,8 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     }
 
     double diff = audio->clock - clock;
-    LOGE("defualtDelayTime:%f 音频的clock减去视频的clock的值是：%f   ", defualtDelayTime, diff);
+    LOGDV("音频clock:%f 视频clock:%f  视频pts：%f  音频的clock减去视频的clock的值是：%f   ", audio->clock, clock, pts,
+          diff);
 
     return diff;
 }
