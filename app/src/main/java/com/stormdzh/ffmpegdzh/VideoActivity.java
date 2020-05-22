@@ -2,15 +2,17 @@ package com.stormdzh.ffmpegdzh;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.stormdzh.ffmpegdzh.util.TimeUtil;
@@ -32,6 +34,7 @@ public class VideoActivity extends Activity {
     private TextView tvCurTime;
     private ImageView ivScale;
     private RelativeLayout videoRoot;
+    private boolean isFullScreen = false;
 
     private DzhMediaPlayer mDzhMediaPlayer;
 
@@ -66,30 +69,50 @@ public class VideoActivity extends Activity {
         ivScale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                if (isFullScreen) {
+//                    setVideoSize(false);
+//                } else {
+//                    setVideoSize(true);
+//                    //全屏需要旋转下图像矩阵
+//                }
+//                isFullScreen = !isFullScreen;
 
                 //判断当前屏幕方向
-                if(getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
                     //切换竖屏
                     VideoActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    setVideoSize(true);
-                }else{
+                } else {
                     //切换横屏
                     VideoActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    setVideoSize(false);
                 }
 
             }
         });
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(getApplicationContext(), "进入横屏模式", Toast.LENGTH_SHORT).show();
+            setVideoSize(false);
+        } else {
+            Toast.makeText(getApplicationContext(), "进入竖屏模式", Toast.LENGTH_SHORT).show();
+            setVideoSize(true);
+        }
+    }
+
     private void setVideoSize(boolean portrait) {
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) videoRoot.getLayoutParams();
 
-        if(portrait){
-            layoutParams.height=TimeUtil.dip2px(this,250);
-        }else{
-            layoutParams.height=RelativeLayout.LayoutParams.MATCH_PARENT;
+        if (portrait) {
+            layoutParams.height = TimeUtil.dip2px(this, 250);
+            Log.i(TAG, "portrait" + portrait + "  250");
+        } else {
+            layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+            Log.i(TAG, "portrait" + portrait + "   MATCH_PARENT");
         }
 
         videoRoot.setLayoutParams(layoutParams);
@@ -203,12 +226,6 @@ public class VideoActivity extends Activity {
         super.onPause();
         if (mGlSufurfaceView != null)
             mGlSufurfaceView.setKeepScreenOn(false);
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
     }
 
     @Override

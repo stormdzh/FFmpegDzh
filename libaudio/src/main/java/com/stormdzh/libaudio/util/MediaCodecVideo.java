@@ -23,6 +23,12 @@ public class MediaCodecVideo {
     private MediaCodec.BufferInfo info;
 
 
+    private String mCodecName;
+    private int mWidth;
+    private int mHeight;
+    private byte[] m_csd_0;
+    private byte[] m_csd_1;
+
     /**
      * 初始化MediaCodec
      *
@@ -34,6 +40,13 @@ public class MediaCodecVideo {
      */
     public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1) {
         Log.d("mediacodec_video", "初始化mediacodec");
+
+        this.mCodecName = codecName;
+        this.mWidth = width;
+        this.mHeight = height;
+        this.m_csd_0 = csd_0;
+        this.m_csd_1 = csd_1;
+
         if (mSurface != null) {
             try {
                 mWLGLSufurfaceView.getVideoRender().setRenderType(DzhVideoRender.RENDER_MEDIACODEC);
@@ -61,6 +74,12 @@ public class MediaCodecVideo {
     }
 
     public void decodeAVPacket(int datasize, byte[] data) {
+
+        //容错处理，在硬编码的时候，可能mSurface 还没有设置进来就调用了initMediaCodec方法，到时无法编解码
+        if (mSurface != null && mediaCodec == null) {
+            initMediaCodec(mCodecName, mWidth, mHeight, m_csd_0, m_csd_1);
+        }
+
         if (mSurface != null && datasize > 0 && data != null && mediaCodec != null) {
             try {
                 int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
@@ -82,8 +101,8 @@ public class MediaCodecVideo {
     }
 
     public void setmSurface(Surface surface) {
+        Log.i("mediacodec_video", "setmSurface 参数为空吗：" + (surface == null));
         if (this.mSurface == null) {
-//            Log.i("mediacodec_video", "setmSurface 参数为空吗：" + (surface == null));
             this.mSurface = surface;
         }
     }

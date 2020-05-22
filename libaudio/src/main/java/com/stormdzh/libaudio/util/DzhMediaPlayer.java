@@ -89,12 +89,14 @@ public class DzhMediaPlayer {
 
     public void mStart() {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                start();
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                start();
+//            }
+//        }).start();
+
+        start();
     }
 
     private String mSource;
@@ -131,7 +133,7 @@ public class DzhMediaPlayer {
 
     //c++ 回调音频进度
     public void onCallTimeInfo(int curtime, int duration) {
-        Log.i(TAG, "onCallTimeInfo duration:" + duration + " curtime:" + curtime);
+//        Log.i(TAG, "onCallTimeInfo duration:" + duration + " curtime:" + curtime);
         if (mOnPlayEventListener != null) {
             mOnPlayEventListener.onProgress(curtime, duration);
         }
