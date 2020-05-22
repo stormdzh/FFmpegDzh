@@ -1,16 +1,16 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
 //
 
-#ifndef FFMPEGDZH_WLFFMPEG_H
-#define FFMPEGDZH_WLFFMPEG_H
+#ifndef FFMPEGDZH_DZHFFMPEG_H
+#define FFMPEGDZH_DZHFFMPEG_H
 
 #include "AndroidLog.h"
 #include <android/log.h>
 #include "pthread.h"
-#include "WlCallJava.h"
-#include "WlAudio.h"
-#include "WlVideo.h"
+#include "DzgCallJava.h"
+#include "DzhAudio.h"
+#include "DzhVideo.h"
 
 extern "C"
 {
@@ -18,14 +18,14 @@ extern "C"
 #include <libavutil/time.h>
 };
 
-class WlFFmpeg {
+class DzhFFmpeg {
 public:
     WlCallJava *callJava = NULL;
     const char *url = NULL;
     pthread_t decodeThread;
     AVFormatContext *pFormatCtx = NULL;
-    WlAudio *audio = NULL;
-    WlPlayState *playState = NULL;
+    DzhAudio *audio = NULL;
+    DzhPlayState *playState = NULL;
     //初始化的锁
     pthread_mutex_t init_mutex;
     //seek的锁
@@ -36,7 +36,7 @@ public:
     int duration = 0;
 
     //视频相关
-    WlVideo *video = NULL;
+    DzhVideo *video = NULL;
 
     //硬解码使用
     AVBitStreamFilter *bsfilter = NULL;
@@ -45,9 +45,9 @@ public:
 
 public:
 
-    WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url);
+    DzhFFmpeg(DzhPlayState *playState, WlCallJava *callJava, const char *url);
 
-    ~WlFFmpeg();
+    ~DzhFFmpeg();
 
     void prepare();
 
@@ -77,4 +77,4 @@ public:
     int getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext);
 };
 
-#endif //FFMPEGDZH_WLFFMPEG_H
+#endif //FFMPEGDZH_DZHFFMPEG_H

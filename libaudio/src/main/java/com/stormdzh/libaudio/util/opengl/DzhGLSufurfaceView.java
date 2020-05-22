@@ -3,22 +3,21 @@ package com.stormdzh.libaudio.util.opengl;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.view.Surface;
 
 /**
- * @Description: 描述
+ * @Description: 视频渲染Surfaceview
  * @Author: dzh
  * @CreateDate: 2020-04-22 10:16
  */
-public class WLGLSufurfaceView extends GLSurfaceView {
+public class DzhGLSufurfaceView extends GLSurfaceView {
 
-    private WlVideoRender wlVideoRender;
+    private DzhVideoRender wlVideoRender;
 
-    public WLGLSufurfaceView(Context context) {
+    public DzhGLSufurfaceView(Context context) {
         this(context, null);
     }
 
-    public WLGLSufurfaceView(Context context, AttributeSet attrs) {
+    public DzhGLSufurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init();
@@ -29,12 +28,12 @@ public class WLGLSufurfaceView extends GLSurfaceView {
         //渲染三角形
 //        setRenderer(new WlRender(getContext()));
         //渲染图片
-        wlVideoRender = new WlVideoRender(getContext());
+        wlVideoRender = new DzhVideoRender(getContext());
         setRenderer(wlVideoRender);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         //硬解码刷新数据
-        wlVideoRender.setOnRenderListener(new WlVideoRender.OnRenderListener() {
+        wlVideoRender.setOnRenderListener(new DzhVideoRender.OnRenderListener() {
             @Override
             public void onRender() {
                 requestRender();
@@ -48,7 +47,7 @@ public class WLGLSufurfaceView extends GLSurfaceView {
         requestRender();
     }
 
-    public WlVideoRender getVideoRender(){
+    public DzhVideoRender getVideoRender() {
         return wlVideoRender;
     }
 }

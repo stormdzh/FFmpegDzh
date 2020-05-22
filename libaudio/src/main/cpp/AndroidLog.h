@@ -1,7 +1,7 @@
 //
-// Created by tal on 2020-04-15.
+// Created by dzh on 2020-04-15.
+// log打印
 //
-
 #include <android/log.h>
 
 #ifndef FFMPEGDZH_ANDROIDLOG_H

@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * @Description: 描述
+ * @Description: 边录边转码的工具类
  * @Author: dzh
  * @CreateDate: 2020-04-19 23:27
  */
-public class MediaCodecUtil {
+public class AudioMediaCodecUtil {
 
     private MediaFormat encoderFormat = null;
     private MediaCodec encoder = null;

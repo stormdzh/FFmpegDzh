@@ -1,23 +1,23 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
 //
 
-#ifndef FFMPEGDZH_WLAUDIO_H
-#define FFMPEGDZH_WLAUDIO_H
+#ifndef FFMPEGDZH_DZHAUDIO_H
+#define FFMPEGDZH_DZHAUDIO_H
 
-#include "WlQueue.h"
-#include "WlPlayState.h"
+#include "DzhQueue.h"
+#include "DzhPlayState.h"
 #include "pthread.h"
 #include "string"
 
-#include "WlCallJava.h"
+#include "DzgCallJava.h"
 
 #include "SoundTouch.h"
 
 using namespace soundtouch;
 
-#include "WlPcmBean.h"
-#include "WlBufferQueue.h"
+#include "DzhPcmBean.h"
+#include "DzhBufferQueue.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -29,7 +29,7 @@ extern "C" {
 };
 
 
-class WlAudio {
+class DzhAudio {
 public:
     //回调到java
     WlCallJava *callJava = NULL;
@@ -38,8 +38,8 @@ public:
     AVCodecParameters *codecpar;
     AVCodecContext *avCodecContext;
 
-    WlQueue *queue = NULL;
-    WlPlayState *playState = NULL;
+    DzhQueue *queue = NULL;
+    DzhPlayState *playState = NULL;
 
     pthread_t playThread;
     AVPacket *avPacket = NULL;
@@ -104,7 +104,7 @@ public:
 
     //pcm数据分包
     pthread_t pcmCallbackThread=NULL;
-    WlBufferQueue *bufferQueue;
+    DzhBufferQueue *bufferQueue;
     int defaultPcmSize=4096;
 
     //seek线程锁
@@ -114,33 +114,42 @@ public:
 
 public:
 
-    WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava);
+    DzhAudio(DzhPlayState *playState, int sample_rate, WlCallJava *callJava);
 
-    ~WlAudio();
+    ~DzhAudio();
 
+    //播放
     void play();
 
+    //音频重采样
     int resampleAudio(void **pcmBuf);
 
+    //初始化 opensles
     void initOpenSLES();
 
+    //获取采样率
     int getCurrentSampleRateForOpensles(int sample_rate);
 
+    //暂停
     void pause();
 
+    //恢复播放
     void resume();
 
+    //停止
     void stop();
 
+    //释放
     void release();
 
+    //设置音量
     void setVolume(int percent);
 
-    //0:右声道 1：左声道  2：立体声
+    //设置声道 0:右声道 1：左声道  2：立体声
     void setMute(int type);
 
 
-    //sountouch
+    //sountouch 里面获取数据
     int getSoundTouchData();
 
     //变调
@@ -156,4 +165,4 @@ public:
 
 };
 
-#endif //FFMPEGDZH_WLAUDIO_H
+#endif //FFMPEGDZH_DZHAUDIO_H

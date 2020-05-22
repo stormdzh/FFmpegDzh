@@ -1,51 +1,52 @@
 //
-// Created by ywl on 2017-12-3.
+// Created by dzh on 2017-12-3.
+// pcm数据分包
 //
 
-#include "WlBufferQueue.h"
+#include "DzhBufferQueue.h"
 #include "AndroidLog.h"
 
-WlBufferQueue::WlBufferQueue(WlPlayState *playStatus) {
+DzhBufferQueue::DzhBufferQueue(DzhPlayState *playStatus) {
     wlPlayStatus = playStatus;
     pthread_mutex_init(&mutexBuffer, NULL);
     pthread_cond_init(&condBuffer, NULL);
 }
 
-WlBufferQueue::~WlBufferQueue() {
+DzhBufferQueue::~DzhBufferQueue() {
     wlPlayStatus = NULL;
     pthread_mutex_destroy(&mutexBuffer);
     pthread_cond_destroy(&condBuffer);
     if(LOG_DEBUG)
     {
-        LOGE("WlBufferQueue 释放完了");
+        LOGE("DzhBufferQueue 释放完了");
     }
 }
 
-void WlBufferQueue::release() {
+void DzhBufferQueue::release() {
 
     if(LOG_DEBUG)
     {
-        LOGE("WlBufferQueue::release");
+        LOGE("DzhBufferQueue::release");
     }
     noticeThread();
     clearBuffer();
 
     if(LOG_DEBUG)
     {
-        LOGE("WlBufferQueue::release success");
+        LOGE("DzhBufferQueue::release success");
     }
 }
 
-int WlBufferQueue::putBuffer(SAMPLETYPE *buffer, int size) {
+int DzhBufferQueue::putBuffer(SAMPLETYPE *buffer, int size) {
     pthread_mutex_lock(&mutexBuffer);
-    WlPcmBean *pcmBean = new WlPcmBean(buffer, size);
+    DzhPcmBean *pcmBean = new DzhPcmBean(buffer, size);
     queueBuffer.push_back(pcmBean);
     pthread_cond_signal(&condBuffer);
     pthread_mutex_unlock(&mutexBuffer);
     return 0;
 }
 
-int WlBufferQueue::getBuffer(WlPcmBean **pcmBean) {
+int DzhBufferQueue::getBuffer(DzhPcmBean **pcmBean) {
 
     pthread_mutex_lock(&mutexBuffer);
 
@@ -67,13 +68,13 @@ int WlBufferQueue::getBuffer(WlPcmBean **pcmBean) {
     return 0;
 }
 
-int WlBufferQueue::clearBuffer() {
+int DzhBufferQueue::clearBuffer() {
 
     pthread_cond_signal(&condBuffer);
     pthread_mutex_lock(&mutexBuffer);
     while (!queueBuffer.empty())
     {
-        WlPcmBean *pcmBean = queueBuffer.front();
+        DzhPcmBean *pcmBean = queueBuffer.front();
         queueBuffer.pop_front();
         delete(pcmBean);
     }
@@ -81,7 +82,7 @@ int WlBufferQueue::clearBuffer() {
     return 0;
 }
 
-int WlBufferQueue::getBufferSize() {
+int DzhBufferQueue::getBufferSize() {
     int size = 0;
     pthread_mutex_lock(&mutexBuffer);
     size = queueBuffer.size();
@@ -90,7 +91,7 @@ int WlBufferQueue::getBufferSize() {
 }
 
 
-int WlBufferQueue::noticeThread() {
+int DzhBufferQueue::noticeThread() {
     pthread_cond_signal(&condBuffer);
     return 0;
 }

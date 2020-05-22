@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat;
 
 import com.stormdzh.libaudio.util.OnPlayEventListener;
 import com.stormdzh.libaudio.util.PlayerPrepareListener;
-import com.stormdzh.libaudio.util.TestJni;
-import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
+import com.stormdzh.libaudio.util.DzhMediaPlayer;
+import com.stormdzh.libaudio.util.opengl.DzhGLSufurfaceView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private SeekBar mSeekBar;
     private SeekBar mVolume;
 
-    private TestJni mTestJni;
+    private DzhMediaPlayer mTestJni;
 
-    private WLGLSufurfaceView wlglSufurfaceView;
+    private DzhGLSufurfaceView wlglSufurfaceView;
 
     public boolean isSeek = false;
 
@@ -43,7 +43,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTestJni = new TestJni();
+        mTestJni = new DzhMediaPlayer();
 
         requestPermissions();
 
@@ -212,7 +212,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.btnCoustom:
                 mTestJni.mutexThread();
                 mTestJni.callbackFromC();
-                mTestJni.setOnErrerListener(new TestJni.OnErrerListener() {
+                mTestJni.setOnErrerListener(new DzhMediaPlayer.OnErrerListener() {
                     @Override
                     public void onError(int code, String msg) {
                         Log.i("MFFMPEG", "code:" + code + "  msg:" + msg);

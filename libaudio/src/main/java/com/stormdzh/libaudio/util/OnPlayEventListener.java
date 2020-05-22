@@ -1,7 +1,7 @@
 package com.stormdzh.libaudio.util;
 
 /**
- * @Description: 描述
+ * @Description: 播放状态的监听
  * @Author: dzh
  * @CreateDate: 2020-04-19 01:37
  */

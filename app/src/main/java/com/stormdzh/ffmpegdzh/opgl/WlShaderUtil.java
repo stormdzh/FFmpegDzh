@@ -43,7 +43,7 @@ public class WlShaderUtil {
             int[] compile = new int[1];
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
             if (compile[0] != GLES20.GL_TRUE) {
-                Log.i("WlShaderUtil", " compile 失败");
+                Log.i("DzhShaderUtil", " compile 失败");
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }
@@ -77,7 +77,7 @@ public class WlShaderUtil {
             int[] linsStatus = new int[1];
             GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linsStatus, 0);
             if (linsStatus[0] != GLES20.GL_TRUE) {
-                Log.i("WlShaderUtil", " linsStatus 失败");
+                Log.i("DzhShaderUtil", " linsStatus 失败");
                 GLES20.glDeleteProgram(program);
                 program = 0;
 

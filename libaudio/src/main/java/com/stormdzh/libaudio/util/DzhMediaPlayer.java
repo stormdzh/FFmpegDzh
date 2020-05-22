@@ -4,22 +4,22 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
-import com.stormdzh.libaudio.util.opengl.WlVideoRender;
+import com.stormdzh.libaudio.util.opengl.DzhGLSufurfaceView;
+import com.stormdzh.libaudio.util.opengl.DzhVideoRender;
 
 import java.io.File;
 
 /**
- * @Description: 描述
+ * @Description: 播放器和c++层的交互
  * @Author: dzh
  * @CreateDate: 2020-04-15 15:29
  */
-public class TestJni {
+public class DzhMediaPlayer {
 
     private static final String TAG = "MFFMPEGJNI";
 
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("dzhplayer");
     }
 
     //测试获取字符串
@@ -202,7 +202,7 @@ public class TestJni {
 
     private native void startRecordPcm(boolean isRecordPcm);
 
-    MediaCodecUtil mMediaCodecUtil = null;
+    AudioMediaCodecUtil mMediaCodecUtil = null;
     private boolean isStartRecordPcm = false;
 
     public void stopRecord() {
@@ -222,7 +222,7 @@ public class TestJni {
             return;
         isStartRecordPcm = true;
         if (mMediaCodecUtil == null) {
-            mMediaCodecUtil = new MediaCodecUtil();
+            mMediaCodecUtil = new AudioMediaCodecUtil();
         }
         Log.i("DDD", "encodecPcmToAAc  getSampleRate:" + getSampleRate());
         if (getSampleRate() > 0) {
@@ -265,10 +265,10 @@ public class TestJni {
 
     //------------------视频播放器-------------------------
 
-    private WLGLSufurfaceView mWLGLSufurfaceView;
+    private DzhGLSufurfaceView mWLGLSufurfaceView;
     private Surface mSurface;
 
-    public void setGLSufurfaceView(WLGLSufurfaceView glSufurfaceView) {
+    public void setGLSufurfaceView(DzhGLSufurfaceView glSufurfaceView) {
         this.mWLGLSufurfaceView = glSufurfaceView;
 
         if (mediaCodecVideo == null) {
@@ -277,7 +277,7 @@ public class TestJni {
         mediaCodecVideo.setmWLGLSufurfaceView(mWLGLSufurfaceView);
 
         if(mWLGLSufurfaceView!=null) {
-            mWLGLSufurfaceView.getVideoRender().setOnSurfaceCreatedListener(new WlVideoRender.OnSurfaceCreatedListener() {
+            mWLGLSufurfaceView.getVideoRender().setOnSurfaceCreatedListener(new DzhVideoRender.OnSurfaceCreatedListener() {
                 @Override
                 public void onSurfaceCreated(Surface surface) {
                     if (mSurface == null) {
@@ -294,7 +294,7 @@ public class TestJni {
 
         Log.i("DDD", "收到ffmpeg回调过来yuv数据 onCallRenderYUV");
         if (mWLGLSufurfaceView != null) {
-            mWLGLSufurfaceView.getVideoRender().setRenderType(WlVideoRender.RENDER_YUV);
+            mWLGLSufurfaceView.getVideoRender().setRenderType(DzhVideoRender.RENDER_YUV);
             mWLGLSufurfaceView.setYUVData(width, height, y, u, v);
         }
     }
@@ -302,7 +302,7 @@ public class TestJni {
     //通过编码名称判断，是否支持硬解码
     public boolean onCallIsSupportMediaCode(String ffCodeNama) {
         Log.i("mediacodec_video","视频编码名称："+ffCodeNama);
-        return WlVideoSupportUitl.isSupportCodec(ffCodeNama);
+        return DzhVideoSupportUitl.isSupportCodec(ffCodeNama);
     }
 
     MediaCodecVideo mediaCodecVideo;

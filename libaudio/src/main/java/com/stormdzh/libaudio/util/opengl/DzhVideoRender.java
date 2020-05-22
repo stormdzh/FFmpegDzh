@@ -5,7 +5,6 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.Surface;
 
 import com.stormdzh.libaudio.R;
@@ -18,11 +17,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * @Description: 描述
+ * @Description: 视频播放器的着色器
  * @Author: dzh
  * @CreateDate: 2020-04-22 10:17
  */
-public class WlVideoRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
+public class DzhVideoRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
 
     public static final int RENDER_YUV=0;
     public static final int RENDER_MEDIACODEC=1;
@@ -86,7 +85,7 @@ public class WlVideoRender implements GLSurfaceView.Renderer, SurfaceTexture.OnF
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureBuffer;
 
-    public WlVideoRender(Context context) {
+    public DzhVideoRender(Context context) {
         this.mContext = context;
         vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
                 .order(ByteOrder.nativeOrder())
@@ -134,9 +133,9 @@ public class WlVideoRender implements GLSurfaceView.Renderer, SurfaceTexture.OnF
 
     private void intRenderYUV() {
 
-        String vertexSource = WlShaderUtil.readRawText(mContext, R.raw.vertex_video_shader);
-        String fragmentSource = WlShaderUtil.readRawText(mContext, R.raw.fragment_yuv_shader);
-        program_yuv = WlShaderUtil.creteProgram(vertexSource, fragmentSource);
+        String vertexSource = DzhShaderUtil.readRawText(mContext, R.raw.vertex_video_shader);
+        String fragmentSource = DzhShaderUtil.readRawText(mContext, R.raw.fragment_yuv_shader);
+        program_yuv = DzhShaderUtil.creteProgram(vertexSource, fragmentSource);
 
         avPosition_yuv = GLES20.glGetAttribLocation(program_yuv, "av_Position");
         afPosition_yuv = GLES20.glGetAttribLocation(program_yuv, "af_Position");
@@ -213,9 +212,9 @@ public class WlVideoRender implements GLSurfaceView.Renderer, SurfaceTexture.OnF
     }
 
     private void initRenderMideaCodec(){
-        String vertexSource = WlShaderUtil.readRawText(mContext, R.raw.vertex_video_shader);
-        String fragmentSource = WlShaderUtil.readRawText(mContext, R.raw.fragment_mediacodec_shader);
-        program_mediacodec = WlShaderUtil.creteProgram(vertexSource, fragmentSource);
+        String vertexSource = DzhShaderUtil.readRawText(mContext, R.raw.vertex_video_shader);
+        String fragmentSource = DzhShaderUtil.readRawText(mContext, R.raw.fragment_mediacodec_shader);
+        program_mediacodec = DzhShaderUtil.creteProgram(vertexSource, fragmentSource);
 
         avPosition_mediacodec = GLES20.glGetAttribLocation(program_mediacodec, "av_Position");
         afPosition_mediacodec = GLES20.glGetAttribLocation(program_mediacodec, "af_Position");

@@ -5,26 +5,26 @@ include_directories(src/main/cpp/include)
 include_directories(src/main/cpp/soundtouch/include)
 include_directories(src/main/cpp/soundtouch/SoundTouch)
 
-message(" add   native-lib")
+message(" add   dzhplayer")
 message(${ANDROID_ABI})
 message(${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libavcodec.so)
 
 add_library( # Sets the name of the library.
-        native-lib
+        dzhplayer
         # Sets the library as a shared library.
         SHARED
-        src/main/cpp/native-lib.cpp
+        src/main/cpp/DzhMediaPlayer.cpp
         src/main/cpp/JavaListener.cpp
-        src/main/cpp/WlAudio.cpp
-        src/main/cpp/WlCallJava.cpp
-        src/main/cpp/WlFFmpeg.cpp
-        src/main/cpp/WlQueue.cpp
-        src/main/cpp/WlPlayState.cpp
+        src/main/cpp/DzhAudio.cpp
+        src/main/cpp/DzgCallJava.cpp
+        src/main/cpp/DzhFFmpeg.cpp
+        src/main/cpp/DzhQueue.cpp
+        src/main/cpp/DzhPlayState.cpp
         src/main/cpp/TestSLES.cpp
-        src/main/cpp/WlPcmBean.cpp
-        src/main/cpp/WlBufferQueue.cpp
+        src/main/cpp/DzhPcmBean.cpp
+        src/main/cpp/DzhBufferQueue.cpp
 
-        src/main/cpp/WlVideo.cpp
+        src/main/cpp/DzhVideo.cpp
 
         ${native_sound_touch}
         )
@@ -76,7 +76,7 @@ set_target_properties(postproc-55
 
 
 target_link_libraries(
-        native-lib
+        dzhplayer
         avcodec-58
         avfilter-7
         avformat-58

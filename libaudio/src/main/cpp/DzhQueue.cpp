@@ -1,9 +1,10 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
+// 音视频的缓存队列
 //
-#include "WlQueue.h"
+#include "DzhQueue.h"
 
-WlQueue::WlQueue(WlPlayState *state) {
+DzhQueue::DzhQueue(DzhPlayState *state) {
 
     this->state = state;
     pthread_mutex_init(&mutexPacket, NULL);
@@ -11,7 +12,7 @@ WlQueue::WlQueue(WlPlayState *state) {
 
 }
 
-WlQueue::~WlQueue() {
+DzhQueue::~DzhQueue() {
 
     clearAvpacket();
     pthread_mutex_destroy(&mutexPacket);
@@ -19,7 +20,7 @@ WlQueue::~WlQueue() {
 }
 
 //把AVPacket添加到队列
-int WlQueue::putAvPacket(AVPacket *packet) {
+int DzhQueue::putAvPacket(AVPacket *packet) {
 
     pthread_mutex_lock(&mutexPacket);
     queuePacket.push(packet);
@@ -30,7 +31,7 @@ int WlQueue::putAvPacket(AVPacket *packet) {
 }
 
 //从队列中获取AVPacket
-int WlQueue::getAvPacket(AVPacket *packet) {
+int DzhQueue::getAvPacket(AVPacket *packet) {
     pthread_mutex_lock(&mutexPacket);
     while (state != NULL && !state->exit) {
 
@@ -52,7 +53,7 @@ int WlQueue::getAvPacket(AVPacket *packet) {
     return 0;
 }
 
-int WlQueue::getQueueSize() {
+int DzhQueue::getQueueSize() {
     int size = 0;
     pthread_mutex_lock(&mutexPacket);
     size = queuePacket.size();
@@ -60,7 +61,7 @@ int WlQueue::getQueueSize() {
     return size;
 }
 
-void WlQueue::clearAvpacket() {
+void DzhQueue::clearAvpacket() {
 
     pthread_cond_signal(&countPacket);
     pthread_mutex_lock(&mutexPacket);
@@ -75,7 +76,7 @@ void WlQueue::clearAvpacket() {
 
 }
 
-void WlQueue::notifyQueue() {
+void DzhQueue::notifyQueue() {
     pthread_cond_signal(&countPacket);
 }
 

@@ -1,24 +1,25 @@
 //
-// Created by tal on 2020-04-20.
+// Created by dzh on 2020-04-20.
+// 视频播放
 //
 
-#include "WlVideo.h"
+#include "DzhVideo.h"
 
-WlVideo::WlVideo(WlPlayState *playState, WlCallJava *wlCallJava) {
+DzhVideo::DzhVideo(DzhPlayState *playState, WlCallJava *wlCallJava) {
 
     this->playState = playState;
     this->wlCallJava = wlCallJava;
-    queue = new WlQueue(playState);
+    queue = new DzhQueue(playState);
     pthread_mutex_init(&codecMutex, NULL);
 }
 
-WlVideo::~WlVideo() {
+DzhVideo::~DzhVideo() {
 
     pthread_mutex_destroy(&codecMutex);
 }
 
 void *playVide(void *data) {
-    WlVideo *video = (WlVideo *) data;
+    DzhVideo *video = (DzhVideo *) data;
 
     while (video->playState != NULL && !video->playState->exit) {
 
@@ -224,14 +225,14 @@ void *playVide(void *data) {
     return 0;
 }
 
-void WlVideo::play() {
+void DzhVideo::play() {
 
     if(playState!=NULL&&!playState->exit) {
         pthread_create(&thread_play, NULL, playVide, this);
     }
 }
 
-void WlVideo::release() {
+void DzhVideo::release() {
 
     if(queue!=NULL){
         queue->notifyQueue();
@@ -268,7 +269,7 @@ void WlVideo::release() {
 }
 
 //返回负数，视频比音频快；整数音频比视频快
-double WlVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
+double DzhVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     double pts = 0;
     if (avFrame != NULL) {
 //        pts = av_frame_get_best_effort_timestamp(avFrame);
@@ -294,7 +295,7 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     return diff;
 }
 
-double WlVideo::getDelayTime(double diff) {
+double DzhVideo::getDelayTime(double diff) {
 
     if (diff > 0.003) {
         delayTime = delayTime * 2 / 3;

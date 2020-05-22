@@ -1,10 +1,11 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
+// ffmpeg 使用类
 //
 
-#include "WlFFmpeg.h"
+#include "DzhFFmpeg.h"
 
-WlFFmpeg::WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url) {
+DzhFFmpeg::DzhFFmpeg(DzhPlayState *playState, WlCallJava *callJava, const char *url) {
     this->playState = playState;
     this->callJava = callJava;
     this->url = url;
@@ -15,13 +16,13 @@ WlFFmpeg::WlFFmpeg(WlPlayState *playState, WlCallJava *callJava, const char *url
 void *decodeFFmpeg(void *data) {
 
 
-    WlFFmpeg *wlFFmpeg = (WlFFmpeg *) data;
+    DzhFFmpeg *wlFFmpeg = (DzhFFmpeg *) data;
     wlFFmpeg->decodeFFmpegThread();
 //    pthread_exit(&wlFFmpeg->decodeThread);
     return 0;
 }
 
-void WlFFmpeg::prepare() {
+void DzhFFmpeg::prepare() {
 
     pthread_create(&decodeThread, NULL, decodeFFmpeg, this);
 }
@@ -30,14 +31,14 @@ void WlFFmpeg::prepare() {
 //加载过程中，退出中断锁，可以正常退出
 int avformat_callback(void *ctx) {
 
-    WlFFmpeg *fFmpeg = (WlFFmpeg *) ctx;
+    DzhFFmpeg *fFmpeg = (DzhFFmpeg *) ctx;
     if (fFmpeg->playState->exit) {
         return AVERROR_EOF;
     }
     return 0;
 }
 
-void WlFFmpeg::decodeFFmpegThread() {
+void DzhFFmpeg::decodeFFmpegThread() {
 
     pthread_mutex_lock(&init_mutex);
     //ffmpeg 4.0以上去掉了av_register_all，不需要调用
@@ -79,7 +80,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         //当前流是音频
         if (pParameters->codec_type == AVMEDIA_TYPE_AUDIO) { //处理音频流
             if (audio == NULL) {
-                audio = new WlAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,
+                audio = new DzhAudio(playState, pFormatCtx->streams[i]->codecpar->sample_rate,
                                     callJava);
                 audio->streamIndex = i;
                 audio->codecpar = pParameters;
@@ -92,7 +93,7 @@ void WlFFmpeg::decodeFFmpegThread() {
             }
         } else if (pParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
             if (video == NULL) {
-                video = new WlVideo(playState, callJava);
+                video = new DzhVideo(playState, callJava);
                 video->streamIndex = i;
                 video->codecpar = pParameters;
                 video->time_base = pFormatCtx->streams[i]->time_base;
@@ -124,7 +125,7 @@ void WlFFmpeg::decodeFFmpegThread() {
 
 }
 
-void WlFFmpeg::start() {
+void DzhFFmpeg::start() {
     if (audio == NULL) {
         callJava->onCallError(CHILD_THREAD, 10007, "audio is null");
         return;
@@ -269,7 +270,7 @@ void WlFFmpeg::start() {
 
 }
 
-void WlFFmpeg::pause() {
+void DzhFFmpeg::pause() {
     if (playState != NULL) {
         playState->pause = true;
     }
@@ -279,7 +280,7 @@ void WlFFmpeg::pause() {
 
 }
 
-void WlFFmpeg::resume() {
+void DzhFFmpeg::resume() {
 
     if (playState != NULL) {
         playState->pause = false;
@@ -290,7 +291,7 @@ void WlFFmpeg::resume() {
     }
 }
 
-void WlFFmpeg::release() {
+void DzhFFmpeg::release() {
     if (playState != NULL && playState->exit) {
         return;
     }
@@ -339,12 +340,12 @@ void WlFFmpeg::release() {
 
 }
 
-WlFFmpeg::~WlFFmpeg() {
+DzhFFmpeg::~DzhFFmpeg() {
     pthread_mutex_destroy(&init_mutex);
     pthread_mutex_destroy(&seek_mutex);
 }
 
-void WlFFmpeg::seek(int64_t secds) {
+void DzhFFmpeg::seek(int64_t secds) {
 
     if (duration <= 0) {
         return;
@@ -381,21 +382,21 @@ void WlFFmpeg::seek(int64_t secds) {
     }
 }
 
-void WlFFmpeg::setVolume(int percent) {
+void DzhFFmpeg::setVolume(int percent) {
 
     if (audio != NULL) {
         audio->setVolume(percent);
     }
 }
 
-void WlFFmpeg::setMute(int type) {
+void DzhFFmpeg::setMute(int type) {
     if (audio != NULL) {
         audio->setMute(type);
     }
 
 }
 
-bool WlFFmpeg::cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data) {
+bool DzhFFmpeg::cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data) {
     if (satrt_tiem >= 0 && end_time < duration && satrt_tiem < end_time) {
 
         audio->isCut = true;
@@ -408,7 +409,7 @@ bool WlFFmpeg::cutAudioPlay(int satrt_tiem, int end_time, bool show_pcm_data) {
 
 }
 
-int WlFFmpeg::getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext) {
+int DzhFFmpeg::getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext) {
     //获取解码器
     AVCodec *pCodec = avcodec_find_decoder(codecpar->codec_id);
     if (pCodec == NULL) {

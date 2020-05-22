@@ -1,15 +1,16 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
+// 音频播放处理类
 //
 
-#include "WlAudio.h"
+#include "DzhAudio.h"
 
-WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) {
+DzhAudio::DzhAudio(DzhPlayState *playState, int sample_rate, WlCallJava *callJava) {
 
     this->callJava = callJava;
     this->sample_rate = sample_rate;
     this->playState = playState;
-    queue = new WlQueue(playState);
+    queue = new DzhQueue(playState);
     buffer = static_cast<uint8_t *>(malloc(sample_rate * 2 * 2));
 
     //soundtouch
@@ -34,7 +35,7 @@ WlAudio::WlAudio(WlPlayState *playState, int sample_rate, WlCallJava *callJava) 
 
 void *decodePlay(void *data) {
 
-    WlAudio *wlaudio = static_cast<WlAudio *>(data);
+    DzhAudio *wlaudio = static_cast<DzhAudio *>(data);
 //    wlaudio->resampleAudio();
     wlaudio->initOpenSLES();
 //    pthread_exit(&wlaudio->playThread);
@@ -42,12 +43,12 @@ void *decodePlay(void *data) {
 }
 
 void *pcmCallBack(void *data) {
-    WlAudio *audio = static_cast<WlAudio *>(data);
-    audio->bufferQueue = new WlBufferQueue(audio->playState);
+    DzhAudio *audio = static_cast<DzhAudio *>(data);
+    audio->bufferQueue = new DzhBufferQueue(audio->playState);
 
     while (audio->playState != NULL && !audio->playState->exit) {
 
-        WlPcmBean *pcmBean = NULL;
+        DzhPcmBean *pcmBean = NULL;
         audio->bufferQueue->getBuffer(&pcmBean);
         if (pcmBean == NULL) {
             continue;
@@ -119,7 +120,7 @@ void *pcmCallBack(void *data) {
 
 //FILE *outFile = fopen("/storage/emulated/0/resample.pcm", "w");
 
-void WlAudio::play() {
+void DzhAudio::play() {
 
     if(playState!=NULL&&!playState->exit) {
         pthread_create(&playThread, NULL, decodePlay, this);
@@ -130,7 +131,7 @@ void WlAudio::play() {
 }
 
 //**pcmBuf 参数也是为了soundtouch加的
-int WlAudio::resampleAudio(void **pcmBuf) {
+int DzhAudio::resampleAudio(void **pcmBuf) {
 
     while (playState != NULL && !playState->exit) {
 
@@ -281,7 +282,7 @@ int WlAudio::resampleAudio(void **pcmBuf) {
 }
 
 
-int WlAudio::getSoundTouchData() {
+int DzhAudio::getSoundTouchData() {
 
     while (playState != NULL && !playState->exit) {
         out_buffer = NULL;
@@ -321,7 +322,7 @@ int WlAudio::getSoundTouchData() {
 
 void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
 
-    WlAudio *wlaudio = static_cast<WlAudio *>(context);
+    DzhAudio *wlaudio = static_cast<DzhAudio *>(context);
     if (wlaudio != NULL) {
 //        int bufferSize = wlaudio->resampleAudio();
         int bufferSize = wlaudio->getSoundTouchData();
@@ -366,7 +367,7 @@ void mPcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     }
 }
 
-void WlAudio::initOpenSLES() {
+void DzhAudio::initOpenSLES() {
 
     //-------------------------------------------
     slCreateEngine(&engineObject, 0, 0, 0, 0, 0);
@@ -444,7 +445,7 @@ void WlAudio::initOpenSLES() {
 
 }
 
-int WlAudio::getCurrentSampleRateForOpensles(int sample_rate) {
+int DzhAudio::getCurrentSampleRateForOpensles(int sample_rate) {
     int rate = 0;
     switch (sample_rate) {
         case 8000:
@@ -492,27 +493,27 @@ int WlAudio::getCurrentSampleRateForOpensles(int sample_rate) {
     return rate;
 }
 
-void WlAudio::pause() {
+void DzhAudio::pause() {
     if (pcmPlayer == NULL)
         return;
     (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PAUSED);
 
 }
 
-void WlAudio::resume() {
+void DzhAudio::resume() {
     if (pcmPlayer == NULL)
         return;
     (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_PLAYING);
 }
 
-void WlAudio::stop() {
+void DzhAudio::stop() {
     if (pcmPlayer == NULL)
         return;
     (*pcmPlayer)->SetPlayState(pcmPlayer, SL_PLAYSTATE_STOPPED);
 
 }
 
-void WlAudio::release() {
+void DzhAudio::release() {
     //停止音频
     stop();
     if(queue!=NULL){
@@ -595,11 +596,11 @@ void WlAudio::release() {
     }
 }
 
-WlAudio::~WlAudio() {
+DzhAudio::~DzhAudio() {
     pthread_mutex_destroy(&codecMutex);
 }
 
-void WlAudio::setVolume(int percent) {
+void DzhAudio::setVolume(int percent) {
     defaultVolume = percent;
     if (pcmVolumePlay != NULL) {
 //        (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -50);
@@ -626,7 +627,7 @@ void WlAudio::setVolume(int percent) {
 
 }
 
-void WlAudio::setMute(int type) {
+void DzhAudio::setMute(int type) {
     if (pcmMuteSoloPlay == NULL) return;
     if (type == 0) { //左声道
         (*pcmMuteSoloPlay)->SetChannelMute(pcmMuteSoloPlay, 1, false);
@@ -641,20 +642,20 @@ void WlAudio::setMute(int type) {
 
 }
 
-void WlAudio::setPitch(double newPitch) {
+void DzhAudio::setPitch(double newPitch) {
     if (soundTouch != NULL) {
         soundTouch->setPitch(newPitch);
     }
 
 }
 
-void WlAudio::setTempo(double newTempo) {
+void DzhAudio::setTempo(double newTempo) {
     if (soundTouch != NULL) {
         soundTouch->setTempo(newTempo);
     }
 }
 
-int WlAudio::getPCMDB(char *pcmdata, size_t pcmsize) {
+int DzhAudio::getPCMDB(char *pcmdata, size_t pcmsize) {
     int db = 0;
     short int prevalue = 0;
     double sum = 0;

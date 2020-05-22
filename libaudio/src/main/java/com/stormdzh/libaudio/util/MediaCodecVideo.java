@@ -5,8 +5,8 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
-import com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView;
-import com.stormdzh.libaudio.util.opengl.WlVideoRender;
+import com.stormdzh.libaudio.util.opengl.DzhGLSufurfaceView;
+import com.stormdzh.libaudio.util.opengl.DzhVideoRender;
 
 import java.nio.ByteBuffer;
 
@@ -36,8 +36,8 @@ public class MediaCodecVideo {
         Log.d("mediacodec_video", "初始化mediacodec");
         if (mSurface != null) {
             try {
-                mWLGLSufurfaceView.getVideoRender().setRenderType(WlVideoRender.RENDER_MEDIACODEC);
-                String mime = WlVideoSupportUitl.findVideoCodecName(codecName);
+                mWLGLSufurfaceView.getVideoRender().setRenderType(DzhVideoRender.RENDER_MEDIACODEC);
+                String mime = DzhVideoSupportUitl.findVideoCodecName(codecName);
                 mediaFormat = MediaFormat.createVideoFormat(mime, width, height);
                 mediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
                 mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd_0));
@@ -88,9 +88,9 @@ public class MediaCodecVideo {
         }
     }
 
-    private WLGLSufurfaceView mWLGLSufurfaceView;
+    private DzhGLSufurfaceView mWLGLSufurfaceView;
 
-    public void setmWLGLSufurfaceView(WLGLSufurfaceView sufurfaceView) {
+    public void setmWLGLSufurfaceView(DzhGLSufurfaceView sufurfaceView) {
         if (mWLGLSufurfaceView == null) {
             Log.i("mediacodec_video", "setmWLGLSufurfaceView");
             this.mWLGLSufurfaceView = sufurfaceView;

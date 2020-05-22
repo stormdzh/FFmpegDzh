@@ -1,11 +1,12 @@
 //
-// Created by tal on 2020-04-17.
+// Created by dzh on 2020-04-17.
+// C++ 调用java的方法
 //
 
-#include <android/log.h>
-#include "WlCallJava.h"
+#include "DzgCallJava.h"
 #include "AndroidLog.h"
 
+//初始化
 WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
     this->javaVm = javaVm;
     this->jniEnv = jniEnv;
@@ -14,7 +15,7 @@ WlCallJava::WlCallJava(JavaVM *javaVm, JNIEnv *jniEnv, jobject *obj) {
 
     jclass jlz = jniEnv->GetObjectClass(jobj);
     if (!jlz) {
-        LOGI("WlCallJava  jlz 错误");
+        LOGI("初始化回调对象异常");
         return;
     }
 
@@ -219,14 +220,15 @@ bool WlCallJava::onCallIsSupportMediaCode(const char *ffcodecname) {
     return support;
 }
 
-void WlCallJava::onCallInitMediaCodec(const char* mine,int width, int height, int csd0_size,uint8_t* csd_0,int csd1_size, uint8_t* csd_1) {
+void WlCallJava::onCallInitMediaCodec(const char *mine, int width, int height, int csd0_size,
+                                      uint8_t *csd_0, int csd1_size, uint8_t *csd_1) {
     JNIEnv *jniEnv;
     if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
         LOGE("call onCallComplete worng");
-        return ;
+        return;
     }
 
-    jstring type=jniEnv->NewStringUTF(mine);
+    jstring type = jniEnv->NewStringUTF(mine);
 
     jbyteArray csd0 = jniEnv->NewByteArray(csd0_size);
     jniEnv->SetByteArrayRegion(csd0, 0, csd0_size, reinterpret_cast<const jbyte *>(csd_0));
@@ -234,7 +236,7 @@ void WlCallJava::onCallInitMediaCodec(const char* mine,int width, int height, in
     jbyteArray csd1 = jniEnv->NewByteArray(csd1_size);
     jniEnv->SetByteArrayRegion(csd1, 0, csd0_size, reinterpret_cast<const jbyte *>(csd_1));
 
-    jniEnv->CallVoidMethod(jobj, jmid_initMediaCodec, type,width, height, csd0, csd1);
+    jniEnv->CallVoidMethod(jobj, jmid_initMediaCodec, type, width, height, csd0, csd1);
 
     jniEnv->DeleteLocalRef(type);
     jniEnv->DeleteLocalRef(csd0);
@@ -248,13 +250,13 @@ void WlCallJava::onCallDecodeAvpackt(int datasize, uint8_t *packtdata) {
     JNIEnv *jniEnv;
     if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
         LOGE("call onCallComplete worng");
-        return ;
+        return;
     }
 
     jbyteArray data = jniEnv->NewByteArray(datasize);
     jniEnv->SetByteArrayRegion(data, 0, datasize, reinterpret_cast<const jbyte *>(packtdata));
 
-    jniEnv->CallVoidMethod(jobj, jmid_decodeavpackt, datasize,data);
+    jniEnv->CallVoidMethod(jobj, jmid_decodeavpackt, datasize, data);
 
     jniEnv->DeleteLocalRef(data);
     javaVm->DetachCurrentThread();

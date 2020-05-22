@@ -279,7 +279,7 @@
         </LinearLayout>
 
 
-        <com.stormdzh.libaudio.util.opengl.WLGLSufurfaceView
+        <com.stormdzh.libaudio.util.opengl.DzhGLSufurfaceView
             android:id="@+id/glSufurfaceView"
             android:layout_marginBottom="50dp"
             android:layout_width="match_parent"

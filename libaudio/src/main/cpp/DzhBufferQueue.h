@@ -1,13 +1,13 @@
 //
-// Created by ywl on 2017-12-3.
+// Created by dzh on 2017-12-3.
 //
 
 #ifndef WLPLAYER_BUFFERQUEUE_H
 #define WLPLAYER_BUFFERQUEUE_H
 
 #include "deque"
-#include "WlPlayState.h"
-#include "WlPcmBean.h"
+#include "DzhPlayState.h"
+#include "DzhPcmBean.h"
 #include <android/log.h>
 
 extern "C"
@@ -16,22 +16,22 @@ extern "C"
 #include "pthread.h"
 };
 
-class WlBufferQueue {
+class DzhBufferQueue {
 
 public:
-    std::deque<WlPcmBean *> queueBuffer;
+    std::deque<DzhPcmBean *> queueBuffer;
     pthread_mutex_t mutexBuffer;
     pthread_cond_t condBuffer;
-    WlPlayState *wlPlayStatus = NULL;
+    DzhPlayState *wlPlayStatus = NULL;
 
 public:
-    WlBufferQueue(WlPlayState *playStatus);
+    DzhBufferQueue(DzhPlayState *playStatus);
 
-    ~WlBufferQueue();
+    ~DzhBufferQueue();
 
     int putBuffer(SAMPLETYPE *buffer, int size);
 
-    int getBuffer(WlPcmBean **pcmBean);
+    int getBuffer(DzhPcmBean **pcmBean);
 
     int clearBuffer();
 

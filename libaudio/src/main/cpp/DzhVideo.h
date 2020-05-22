@@ -1,13 +1,13 @@
 //
-// Created by tal on 2020-04-20.
+// Created by dzh on 2020-04-20.
 //
 
-#ifndef FFMPEGDZH_WLVIDEO_H
-#define FFMPEGDZH_WLVIDEO_H
+#ifndef FFMPEGDZH_DZHVIDEO_H
+#define FFMPEGDZH_DZHVIDEO_H
 
-#include "WlQueue.h"
-#include "WlCallJava.h"
-#include "WlAudio.h"
+#include "DzhQueue.h"
+#include "DzgCallJava.h"
+#include "DzhAudio.h"
 
 
 #define CODEC_YUV 0
@@ -20,13 +20,13 @@ extern "C" {
 #include <libswscale/swscale.h>
 };
 
-class WlVideo {
+class DzhVideo {
 public:
     int streamIndex = -1;
     AVCodecContext *avCodecContext = NULL;
     AVCodecParameters *codecpar = NULL;
-    WlQueue *queue = NULL;
-    WlPlayState *playState = NULL;
+    DzhQueue *queue = NULL;
+    DzhPlayState *playState = NULL;
     WlCallJava *wlCallJava = NULL;
 
     AVRational time_base;
@@ -34,7 +34,7 @@ public:
     pthread_t thread_play;
 
     //处理音视频同步
-    WlAudio *audio=NULL;
+    DzhAudio *audio=NULL;
     double clock=0;
     double delayTime=0;
     double defualtDelayTime=0.04;
@@ -49,9 +49,9 @@ public:
 
 
 public:
-    WlVideo(WlPlayState *playState, WlCallJava *wlCallJava);
+    DzhVideo(DzhPlayState *playState, WlCallJava *wlCallJava);
 
-    ~WlVideo();
+    ~DzhVideo();
 
     void play();
 
@@ -63,4 +63,4 @@ public:
     double getDelayTime(double diff);
 };
 
-#endif //FFMPEGDZH_WLVIDEO_H
+#endif //FFMPEGDZH_DZHVIDEO_H

@@ -1,5 +1,5 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
 //
 
 #ifndef FFMPEGDZH_TESTSLES_H

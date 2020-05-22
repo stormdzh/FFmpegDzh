@@ -1,5 +1,5 @@
 //
-// Created by tal on 2020-04-15.
+// Created by dzh on 2020-04-15.
 //
 #include <jni.h>
 #include <string>
@@ -9,8 +9,8 @@
 
 #include "pthread.h"
 
-#include "WlCallJava.h"
-#include "WlFFmpeg.h"
+#include "DzgCallJava.h"
+#include "DzhFFmpeg.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -18,11 +18,11 @@ extern "C" {
 }
 
 
-WlPlayState *playState = NULL;
+DzhPlayState *playState = NULL;
 bool nativeExit = true;
 
 extern "C"
-JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_stringFromJni(JNIEnv *env,
+JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_DzhMediaPlayer_stringFromJni(JNIEnv *env,
                                                                                 jobject) {
 
     std::string hello = "hello jni";
@@ -32,7 +32,7 @@ JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_stringFromJni(
 
 
 extern "C"
-JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_TestJni_testFFmpeg(JNIEnv *env, jobject) {
+JNIEXPORT jstring JNICALL Java_com_stormdzh_libaudio_util_DzhMediaPlayer_testFFmpeg(JNIEnv *env, jobject) {
 
     LOGI("测试FFmpeg开始");
     av_register_all();
@@ -73,7 +73,7 @@ void *normalCallBack(void *data) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_normalThread(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_normalThread(JNIEnv *env, jobject thiz) {
     LOGD("创建线程");
     threadRuning = 1;
     int result = pthread_create(&thread, NULL, normalCallBack, NULL);
@@ -84,7 +84,7 @@ Java_com_stormdzh_libaudio_util_TestJni_normalThread(JNIEnv *env, jobject thiz) 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_stopNormalThread(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_stopNormalThread(JNIEnv *env, jobject thiz) {
     LOGD("停止线程");
     threadRuning = 0;
     if (thread != NULL) {
@@ -146,7 +146,7 @@ void *customCallback(void *data) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_mutexThread(JNIEnv *env, jobject instance) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_mutexThread(JNIEnv *env, jobject instance) {
 
 
     for (int i = 0; i < 10; i++) {
@@ -180,7 +180,7 @@ void *childCallback(void *data) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_callbackFromC(JNIEnv *env, jobject instance) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_callbackFromC(JNIEnv *env, jobject instance) {
 
     // TODO
     javaListener = new JavaListener(jvm, env, env->NewGlobalRef(instance));
@@ -208,7 +208,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_playPcm(JNIEnv *env, jobject thiz, jstring _pcmpath) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_playPcm(JNIEnv *env, jobject thiz, jstring _pcmpath) {
     // TODO: implement playPcm()
     const char *source = env->GetStringUTFChars(_pcmpath, 0);
     LOGE("播放pcm地址：%s", source);
@@ -219,14 +219,14 @@ Java_com_stormdzh_libaudio_util_TestJni_playPcm(JNIEnv *env, jobject thiz, jstri
 
 //-----------------------音乐播放器------------------------------------
 
-WlFFmpeg *mFFmpeg = NULL;
+DzhFFmpeg *mFFmpeg = NULL;
 WlCallJava *callJava = NULL;
 
 pthread_t thread_start = NULL;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstring _source) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_prepare(JNIEnv *env, jobject thiz, jstring _source) {
     const char *source = env->GetStringUTFChars(_source, 0);
 
     LOGE("播放地址：%s", source);
@@ -238,8 +238,8 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
         }
 
         callJava->onCallLoad(MAIN_THREAD, true);
-        playState = new WlPlayState();
-        mFFmpeg = new WlFFmpeg(playState, callJava, source);
+        playState = new DzhPlayState();
+        mFFmpeg = new DzhFFmpeg(playState, callJava, source);
 
         mFFmpeg->prepare();
     }
@@ -250,7 +250,7 @@ Java_com_stormdzh_libaudio_util_TestJni_prepare(JNIEnv *env, jobject thiz, jstri
 
 
 void *startCallback(void *data) {
-    WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
+    DzhFFmpeg *fFmpeg = (DzhFFmpeg *) data;
     if (fFmpeg != NULL) {
         fFmpeg->start();
     }
@@ -261,7 +261,7 @@ void *startCallback(void *data) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_start(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_start(JNIEnv *env, jobject thiz) {
     LOGE("播放地址 start()");
     if (mFFmpeg != NULL) {
         pthread_create(&thread_start, NULL, startCallback, mFFmpeg);
@@ -271,7 +271,7 @@ Java_com_stormdzh_libaudio_util_TestJni_start(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_pause(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_pause(JNIEnv *env, jobject thiz) {
     // TODO: implement pause()
 
     if (mFFmpeg != NULL) {
@@ -281,7 +281,7 @@ Java_com_stormdzh_libaudio_util_TestJni_pause(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_resume(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_resume(JNIEnv *env, jobject thiz) {
     // TODO: implement resume()
     if (mFFmpeg != NULL) {
         mFFmpeg->resume();
@@ -291,7 +291,7 @@ Java_com_stormdzh_libaudio_util_TestJni_resume(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_nstop(JNIEnv *env, jobject thiz) {
     // TODO: implement nstop()
     if (!nativeExit) {
 
@@ -318,14 +318,14 @@ Java_com_stormdzh_libaudio_util_TestJni_nstop(JNIEnv *env, jobject thiz) {
 
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_seekto(JNIEnv *env, jobject thiz, jint msc) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_seekto(JNIEnv *env, jobject thiz, jint msc) {
     // TODO: implement seekto()
     if (mFFmpeg != NULL) {
         mFFmpeg->seek(msc);
     }
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_setVolume(JNIEnv *env, jobject thiz, jint percent) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_setVolume(JNIEnv *env, jobject thiz, jint percent) {
     // TODO: implement setVolume()
     if (mFFmpeg != NULL) {
         mFFmpeg->setVolume(percent);
@@ -335,7 +335,7 @@ Java_com_stormdzh_libaudio_util_TestJni_setVolume(JNIEnv *env, jobject thiz, jin
 //-----------------------音乐播放器------------------------------------
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_getVolume(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_getVolume(JNIEnv *env, jobject thiz) {
     // TODO: implement getVolume()
     int volume = 100;
     if (mFFmpeg != NULL) {
@@ -346,7 +346,7 @@ Java_com_stormdzh_libaudio_util_TestJni_getVolume(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_setMute(JNIEnv *env, jobject thiz, jint type) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_setMute(JNIEnv *env, jobject thiz, jint type) {
     // TODO: implement setMute()
     if (mFFmpeg != NULL) {
         mFFmpeg->setMute(type);
@@ -355,7 +355,7 @@ Java_com_stormdzh_libaudio_util_TestJni_setMute(JNIEnv *env, jobject thiz, jint 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_setPitch(JNIEnv *env, jobject thiz, jdouble new_pitch) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_setPitch(JNIEnv *env, jobject thiz, jdouble new_pitch) {
     // TODO: implement setPitch()
     if (mFFmpeg != NULL) {
         mFFmpeg->audio->setPitch(new_pitch);
@@ -364,14 +364,14 @@ Java_com_stormdzh_libaudio_util_TestJni_setPitch(JNIEnv *env, jobject thiz, jdou
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_setTempo(JNIEnv *env, jobject thiz, jdouble new_tempo) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_setTempo(JNIEnv *env, jobject thiz, jdouble new_tempo) {
     // TODO: implement setTempo()
     if (mFFmpeg != NULL) {
         mFFmpeg->audio->setTempo(new_tempo);
     }
 }extern "C"
 JNIEXPORT jint JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_getSampleRate(JNIEnv *env, jobject thiz) {
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_getSampleRate(JNIEnv *env, jobject thiz) {
     // TODO: implement getSampleRate()
     int sampleRate = 0;
     if (mFFmpeg != NULL) {
@@ -380,7 +380,7 @@ Java_com_stormdzh_libaudio_util_TestJni_getSampleRate(JNIEnv *env, jobject thiz)
     return sampleRate;
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_startRecordPcm(JNIEnv *env, jobject thiz,
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_startRecordPcm(JNIEnv *env, jobject thiz,
                                                        jboolean is_record_pcm) {
     // TODO: implement startRecordPcm()
 
@@ -391,7 +391,7 @@ Java_com_stormdzh_libaudio_util_TestJni_startRecordPcm(JNIEnv *env, jobject thiz
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_stormdzh_libaudio_util_TestJni_cutAudioPlay(JNIEnv *env, jobject thiz, jint satrt_tiem,
+Java_com_stormdzh_libaudio_util_DzhMediaPlayer_cutAudioPlay(JNIEnv *env, jobject thiz, jint satrt_tiem,
                                                      jint end_time, jboolean show_pcm_data) {
     if(mFFmpeg!=NULL){
         return mFFmpeg->cutAudioPlay(satrt_tiem,end_time,show_pcm_data);

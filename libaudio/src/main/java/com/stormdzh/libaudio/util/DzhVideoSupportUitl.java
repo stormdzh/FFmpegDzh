@@ -5,7 +5,12 @@ import android.media.MediaCodecList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WlVideoSupportUitl {
+/**
+ * @description 判断是否支持硬解码
+ * @author: dzh
+ * @CreateDate: ${DATE} ${TIME}
+ */
+public class DzhVideoSupportUitl {
 
     private static Map<String, String> codecMap = new HashMap<>();
 
@@ -20,6 +25,12 @@ public class WlVideoSupportUitl {
         return "";
     }
 
+    /**
+     * 通过编码器的名称判断是否支持
+     *
+     * @param ffcodecname 编码器名称
+     * @return true：支持，false 不支持
+     */
     public static boolean isSupportCodec(String ffcodecname) {
         boolean supportvideo = false;
         int count = MediaCodecList.getCodecCount();

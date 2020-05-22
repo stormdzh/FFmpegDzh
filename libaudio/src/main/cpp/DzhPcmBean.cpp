@@ -1,17 +1,17 @@
 //
-// Created by tal on 2020-04-20.
+// Created by dzh on 2020-04-20.
 //
 
-#include "WlPcmBean.h"
+#include "DzhPcmBean.h"
 
-WlPcmBean::WlPcmBean(SAMPLETYPE *buffer, int size) {
+DzhPcmBean::DzhPcmBean(SAMPLETYPE *buffer, int size) {
     this->buffer = (char *) malloc(size);
     this->buffsize = size;
     memcpy(this->buffer, buffer, buffsize);
 
 }
 
-WlPcmBean::~WlPcmBean() {
+DzhPcmBean::~DzhPcmBean() {
 
     free(this->buffer);
     buffer == NULL;

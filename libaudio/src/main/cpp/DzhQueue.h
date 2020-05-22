@@ -1,32 +1,32 @@
 //
-// Created by tal on 2020-04-18.
+// Created by dzh on 2020-04-18.
 //
 
-#ifndef FFMPEGDZH_WLQUEUE_H
-#define FFMPEGDZH_WLQUEUE_H
+#ifndef FFMPEGDZH_DZHQUEUE_H
+#define FFMPEGDZH_DZHQUEUE_H
 
 #include <pthread.h>
 #include "queue"
 #include "unistd.h"
 #include "AndroidLog.h"
 #include <android/log.h>
-#include "WlPlayState.h"
+#include "DzhPlayState.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 };
 
-class WlQueue {
+class DzhQueue {
 public:
     std::queue<AVPacket *> queuePacket;
     pthread_mutex_t mutexPacket;
     pthread_cond_t countPacket;
-    WlPlayState *state =NULL;
+    DzhPlayState *state =NULL;
 
 public:
-    WlQueue(WlPlayState *state);
+    DzhQueue(DzhPlayState *state);
 
-    ~WlQueue();
+    ~DzhQueue();
 
     int putAvPacket(AVPacket *packet);
     int getAvPacket(AVPacket *packet);
@@ -40,4 +40,4 @@ public:
 };
 
 
-#endif //FFMPEGDZH_WLQUEUE_H
+#endif //FFMPEGDZH_DZHQUEUE_H
