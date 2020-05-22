@@ -33,9 +33,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private SeekBar mSeekBar;
     private SeekBar mVolume;
 
-    private DzhMediaPlayer mTestJni;
+    private DzhMediaPlayer mDzhMediaPlayer;
 
-    private DzhGLSufurfaceView wlglSufurfaceView;
+    private DzhGLSufurfaceView mGlSufurfaceView;
 
     public boolean isSeek = false;
 
@@ -43,7 +43,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTestJni = new DzhMediaPlayer();
+        mDzhMediaPlayer = new DzhMediaPlayer();
 
         requestPermissions();
 
@@ -52,9 +52,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         tvProgress = findViewById(R.id.tvProgress);
         mSeekBar = findViewById(R.id.mSeekBar);
         mVolume = findViewById(R.id.mVolume);
-        wlglSufurfaceView = findViewById(R.id.glSufurfaceView);
-        wlglSufurfaceView.setKeepScreenOn(true);
-        mTestJni.setGLSufurfaceView(wlglSufurfaceView);
+        mGlSufurfaceView = findViewById(R.id.glSufurfaceView);
+        mGlSufurfaceView.setKeepScreenOn(true);
+        mDzhMediaPlayer.setGLSufurfaceView(mGlSufurfaceView);
 
         findViewById(R.id.btnNormalThread).setOnClickListener(this);
         findViewById(R.id.btnStopNormalThread).setOnClickListener(this);
@@ -97,10 +97,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int progress = seekBar.getProgress();
-                if (mTestJni != null) {
+                if (mDzhMediaPlayer != null) {
                     int seekto = (int) (mduration * ((double) progress / 100));
                     Log.i(TAG, "seek 时间：" + seekto);
-                    mTestJni.seekto(seekto);
+                    mDzhMediaPlayer.seekto(seekto);
                 }
 
                 isSeek = false;
@@ -111,7 +111,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 Log.i(TAG, "seek 音量：" + progress);
-                mTestJni.setVolume(progress);
+                mDzhMediaPlayer.setVolume(progress);
             }
 
             @Override
@@ -125,10 +125,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         });
 
 
-        tvTest.setText(mTestJni.stringFromJni());
-        tvVersion.setText("获取到ffmpeg版本号:" + mTestJni.testFFmpeg());
+        tvTest.setText(mDzhMediaPlayer.stringFromJni());
+        tvVersion.setText("获取到ffmpeg版本号:" + mDzhMediaPlayer.testFFmpeg());
 
-        mTestJni.setOnPlayEventListener(new OnPlayEventListener() {
+        mDzhMediaPlayer.setOnPlayEventListener(new OnPlayEventListener() {
 
             @Override
             public void onStart() {
@@ -177,6 +177,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         });
 
 
+        //直接跳转到列表
+        startActivity(new Intent(this,VideoListActivity.class));
+
     }
 
     private void requestPermissions() {
@@ -204,15 +207,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnNormalThread:
-                mTestJni.normalThread();
+                mDzhMediaPlayer.normalThread();
                 break;
             case R.id.btnStopNormalThread:
-                mTestJni.stopNormalThread();
+                mDzhMediaPlayer.stopNormalThread();
                 break;
             case R.id.btnCoustom:
-                mTestJni.mutexThread();
-                mTestJni.callbackFromC();
-                mTestJni.setOnErrerListener(new DzhMediaPlayer.OnErrerListener() {
+                mDzhMediaPlayer.mutexThread();
+                mDzhMediaPlayer.callbackFromC();
+                mDzhMediaPlayer.setOnErrerListener(new DzhMediaPlayer.OnErrerListener() {
                     @Override
                     public void onError(int code, String msg) {
                         Log.i("MFFMPEG", "code:" + code + "  msg:" + msg);
@@ -223,7 +226,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.btnPlayPcm:
                 File pcmFile = new File(Environment.getExternalStorageDirectory(), "mydream.pcm");
 //                File pcmFile = new File(Environment.getExternalStorageDirectory(), "resample.pcm");
-                mTestJni.playPcm(pcmFile.getAbsolutePath());
+                mDzhMediaPlayer.playPcm(pcmFile.getAbsolutePath());
                 break;
             case R.id.btnStart:
 //                File mp3File = new File(Environment.getExternalStorageDirectory(), "3_test.wav");
@@ -238,77 +241,77 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     return;
                 }
                 Log.i(TAG, "btnStart");
-//                mTestJni.setSource(mp3File.getAbsolutePath());
-                mTestJni.setSource("http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8");
-//                mTestJni.setSource("https://wp.zp68.com/sub/filestores/2016/07/20/2ad2953e033490cced7ab572564e84b5.mp3");
-//                 mTestJni.setSource("http://stormful.oss-cn-shanghai.aliyuncs.com/0era/english/exam/10001_genuine.mp3?Expires=1587228202&OSSAccessKeyId=TMP.3KfDWMD2Es63VZdTpWymksHtsZNg8U4s4Zq2bbG9ym4fR43CpnpNwUe3bqZaXj9ueTFQUZU2ZLPM5D9dA8zZTqdNgUyrX6&Signature=WZpie2CP5fOHjIL6dwyV3Ar9lo8%3D");
-                //                mTestJni.testFFmpeg()
-                mTestJni.setPlayerPrepareListener(new PlayerPrepareListener() {
+//                mDzhMediaPlayer.setSource(mp3File.getAbsolutePath());
+                mDzhMediaPlayer.setSource("http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8");
+//                mDzhMediaPlayer.setSource("https://wp.zp68.com/sub/filestores/2016/07/20/2ad2953e033490cced7ab572564e84b5.mp3");
+//                 mDzhMediaPlayer.setSource("http://stormful.oss-cn-shanghai.aliyuncs.com/0era/english/exam/10001_genuine.mp3?Expires=1587228202&OSSAccessKeyId=TMP.3KfDWMD2Es63VZdTpWymksHtsZNg8U4s4Zq2bbG9ym4fR43CpnpNwUe3bqZaXj9ueTFQUZU2ZLPM5D9dA8zZTqdNgUyrX6&Signature=WZpie2CP5fOHjIL6dwyV3Ar9lo8%3D");
+                //                mDzhMediaPlayer.testFFmpeg()
+                mDzhMediaPlayer.setPlayerPrepareListener(new PlayerPrepareListener() {
                     @Override
                     public void onPrepared() {
                         Log.i("MFFMPEG", "音频已经准备完成");
-                        mTestJni.mStart();
+                        mDzhMediaPlayer.mStart();
                     }
                 });
-                mTestJni.mprepare();
+                mDzhMediaPlayer.mprepare();
 
                 break;
             case R.id.btnPause:
-                mTestJni.pause();
+                mDzhMediaPlayer.pause();
                 break;
             case R.id.btnResume:
-                mTestJni.resume();
+                mDzhMediaPlayer.resume();
                 break;
             case R.id.btnStop:
-                mTestJni.stop();
+                mDzhMediaPlayer.stop();
                 break;
             case R.id.btnLeft:
-                mTestJni.volumeLeft();
+                mDzhMediaPlayer.volumeLeft();
                 break;
             case R.id.btnRight:
-                mTestJni.volumeRight();
+                mDzhMediaPlayer.volumeRight();
                 break;
             case R.id.btnLeftRight:
-                mTestJni.volumeLeftRight();
+                mDzhMediaPlayer.volumeLeftRight();
                 break;
             case R.id.btnPitch1:
-                mTestJni.setPitch(1);
+                mDzhMediaPlayer.setPitch(1);
                 break;
             case R.id.btnPitch15:
-                mTestJni.setPitch(1.5);
+                mDzhMediaPlayer.setPitch(1.5);
                 break;
             case R.id.btnTempo1:
-                mTestJni.setTempo(1);
+                mDzhMediaPlayer.setTempo(1);
                 break;
             case R.id.btnTempo2:
-                mTestJni.setTempo(2);
+                mDzhMediaPlayer.setTempo(2);
                 break;
             case R.id.btnStartRecord:
                 File outFile = new File(Environment.getExternalStorageDirectory(), "pcmToAac.aac");
                 if (outFile.exists()) {
                     outFile.delete();
                 }
-                mTestJni.startRecord(outFile);
+                mDzhMediaPlayer.startRecord(outFile);
                 break;
             case R.id.btnStopRecord:
-                mTestJni.stopRecord();
+                mDzhMediaPlayer.stopRecord();
                 break;
             case R.id.btnPuaseRecord:
-                mTestJni.paauseRecord();
+                mDzhMediaPlayer.paauseRecord();
                 break;
             case R.id.btnContinueRecord:
-                mTestJni.continueRecord();
+                mDzhMediaPlayer.continueRecord();
                 break;
             case R.id.btnCutAudioPlay:
                 File cut = new File(Environment.getExternalStorageDirectory(), "bb.mp3");
-                mTestJni.setSource(cut.getAbsolutePath());
-                mTestJni.setPlayerPrepareListener(new PlayerPrepareListener() {
+                mDzhMediaPlayer.setSource(cut.getAbsolutePath());
+                mDzhMediaPlayer.setPlayerPrepareListener(new PlayerPrepareListener() {
                     @Override
                     public void onPrepared() {
-                        mTestJni.mCutAudioPlay(20, 40, true);
+                        mDzhMediaPlayer.mCutAudioPlay(20, 40, true);
                     }
                 });
-                mTestJni.mprepare();
+                mDzhMediaPlayer.mprepare();
 
                 break;
 

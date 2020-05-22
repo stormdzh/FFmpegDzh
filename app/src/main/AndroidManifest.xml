@@ -21,6 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestOpenGlesActivity"/>
+        <activity android:name=".VideoListActivity"/>
+        <activity android:name=".VideoActivity"/>
     </application>
 
 </manifest>
