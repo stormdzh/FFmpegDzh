@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -15,7 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.stormdzh.ffmpegdzh.util.TimeUtil;
+import com.stormdzh.ffmpegdzh.util.AppUtil;
 import com.stormdzh.libaudio.util.DzhMediaPlayer;
 import com.stormdzh.libaudio.util.OnPlayEventListener;
 import com.stormdzh.libaudio.util.PlayerPrepareListener;
@@ -34,7 +35,8 @@ public class VideoActivity extends Activity {
     private TextView tvCurTime;
     private ImageView ivScale;
     private RelativeLayout videoRoot;
-    private boolean isFullScreen = false;
+    private LinearLayout llBootom;
+    private boolean isFullScreen = true;
 
     private DzhMediaPlayer mDzhMediaPlayer;
 
@@ -55,6 +57,7 @@ public class VideoActivity extends Activity {
         tvCurTime = findViewById(R.id.tvCurTime);
         ivScale = findViewById(R.id.ivScale);
         videoRoot = findViewById(R.id.videoRoot);
+        llBootom = findViewById(R.id.llBootom);
 
 
         initPlayer();
@@ -88,6 +91,10 @@ public class VideoActivity extends Activity {
 
             }
         });
+
+        if (isFullScreen) {
+            VideoActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 
     @Override
@@ -108,11 +115,12 @@ public class VideoActivity extends Activity {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) videoRoot.getLayoutParams();
 
         if (portrait) {
-            layoutParams.height = TimeUtil.dip2px(this, 250);
+            layoutParams.height = AppUtil.dip2px(this, 250);
             Log.i(TAG, "portrait" + portrait + "  250");
         } else {
             layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
             Log.i(TAG, "portrait" + portrait + "   MATCH_PARENT");
+            layoutParams.width = AppUtil.getScreenH(this) / 9 * 16;
         }
 
         videoRoot.setLayoutParams(layoutParams);
@@ -132,8 +140,11 @@ public class VideoActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tvCurTime.setText(TimeUtil.getPlayerDate(curtime));
-                        tvDuration.setText(TimeUtil.getPlayerDate(duration));
+                        if (duration <= 0 && llBootom != null && llBootom.getVisibility() != View.GONE) {
+                            llBootom.setVisibility(View.GONE);
+                        }
+                        tvCurTime.setText(AppUtil.getPlayerDate(curtime));
+                        tvDuration.setText(AppUtil.getPlayerDate(duration));
                         double per = ((double) curtime / (double) duration) * 100;
                         if (!isSeek && duration > 0) {
                             mSeekBar.setProgress((int) per);

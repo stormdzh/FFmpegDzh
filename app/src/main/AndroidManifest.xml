@@ -25,6 +25,7 @@
         <activity android:name=".TestOpenGlesActivity" />
         <activity android:name=".VideoListActivity" />
         <activity
+            android:theme="@style/FullAppTheme"
             android:name=".VideoActivity"
             android:configChanges="orientation|keyboard|layoutDirection|screenSize" />
     </application>

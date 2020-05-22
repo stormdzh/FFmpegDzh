@@ -2,6 +2,7 @@ package com.stormdzh.ffmpegdzh.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,11 @@ public class VideoListAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
         VideoViewHolder videoViewHolder= (VideoViewHolder) holder;
-
+        if(position%2==0) {
+            videoViewHolder.itemView.setBackgroundColor(Color.parseColor("#FFEFD5"));
+        }else{
+            videoViewHolder.itemView.setBackgroundColor(Color.parseColor("#FFFACD"));
+        }
         videoViewHolder.tvName.setText(mList.get(position).name);
         videoViewHolder.tvName.setOnClickListener(new View.OnClickListener() {
             @Override
