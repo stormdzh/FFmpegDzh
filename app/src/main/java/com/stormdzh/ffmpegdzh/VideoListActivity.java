@@ -52,6 +52,7 @@ public class VideoListActivity extends Activity {
         mVideoList = new ArrayList<>();
 
         mVideoList.add(new VideoListEntity("CCTV1","http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8"));
-        mVideoList.add(new VideoListEntity("本地视频",new File(Environment.getExternalStorageDirectory(), "testmv.mp4").getAbsolutePath()));
+        mVideoList.add(new VideoListEntity("本地视频 h264",new File(Environment.getExternalStorageDirectory(), "testmv.mp4").getAbsolutePath()));
+        mVideoList.add(new VideoListEntity("本地视频 h265",new File(Environment.getExternalStorageDirectory(), "video-h265.mkv").getAbsolutePath()));
     }
 }
