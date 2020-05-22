@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.stormdzh.ffmpegdzh.adapter.VideoListAdapter;
 import com.stormdzh.ffmpegdzh.entity.VideoListEntity;
+import com.stormdzh.ffmpegdzh.util.AppUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ public class VideoListActivity extends Activity {
         mRecyclerView = findViewById(R.id.mRecyclerView);
 
         setVideoListData();
+
+        AppUtil.getList();
     }
 
     private void setVideoListData() {

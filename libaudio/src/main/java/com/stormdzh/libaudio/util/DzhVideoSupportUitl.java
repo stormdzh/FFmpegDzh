@@ -1,6 +1,7 @@
 package com.stormdzh.libaudio.util;
 
 import android.media.MediaCodecList;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class DzhVideoSupportUitl {
             String[] tyeps = MediaCodecList.getCodecInfoAt(i).getSupportedTypes();
             for (int j = 0; j < tyeps.length; j++) {
                 if (tyeps[j].equals(findVideoCodecName(ffcodecname))) {
+                    Log.i("supportCodec","ffcodecname："+ffcodecname+"  找到的名称是："+findVideoCodecName(ffcodecname));
                     supportvideo = true;
                     break;
                 }
