@@ -3,7 +3,7 @@
 // C++ 调用java的方法
 //
 
-#include "DzgCallJava.h"
+#include "DzhCallJava.h"
 #include "AndroidLog.h"
 
 //初始化

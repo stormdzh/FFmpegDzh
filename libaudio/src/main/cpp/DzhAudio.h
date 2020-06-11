@@ -10,7 +10,7 @@
 #include "pthread.h"
 #include "string"
 
-#include "DzgCallJava.h"
+#include "DzhCallJava.h"
 
 #include "SoundTouch.h"
 

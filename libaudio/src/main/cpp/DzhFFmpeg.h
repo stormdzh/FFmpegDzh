@@ -8,7 +8,7 @@
 #include "AndroidLog.h"
 #include <android/log.h>
 #include "pthread.h"
-#include "DzgCallJava.h"
+#include "DzhCallJava.h"
 #include "DzhAudio.h"
 #include "DzhVideo.h"
 

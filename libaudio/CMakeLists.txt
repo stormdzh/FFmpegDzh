@@ -16,7 +16,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/DzhMediaPlayer.cpp
         src/main/cpp/JavaListener.cpp
         src/main/cpp/DzhAudio.cpp
-        src/main/cpp/DzgCallJava.cpp
+        src/main/cpp/DzhCallJava.cpp
         src/main/cpp/DzhFFmpeg.cpp
         src/main/cpp/DzhQueue.cpp
         src/main/cpp/DzhPlayState.cpp

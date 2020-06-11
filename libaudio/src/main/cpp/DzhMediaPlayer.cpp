@@ -9,7 +9,7 @@
 
 #include "pthread.h"
 
-#include "DzgCallJava.h"
+#include "DzhCallJava.h"
 #include "DzhFFmpeg.h"
 
 extern "C" {

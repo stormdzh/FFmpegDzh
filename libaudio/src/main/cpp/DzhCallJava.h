@@ -2,8 +2,8 @@
 // Created by dzh on 2020-04-17.
 //
 
-#ifndef FFMPEGDZH_DZGCALLJAVA_H
-#define FFMPEGDZH_DZGCALLJAVA_H
+#ifndef FFMPEGDZH_DZHCALLJAVA_H
+#define FFMPEGDZH_DZHCALLJAVA_H
 
 
 #include <jni.h>
@@ -73,4 +73,4 @@ public:
 };
 
 
-#endif //FFMPEGDZH_DZGCALLJAVA_H
+#endif //FFMPEGDZH_DZHCALLJAVA_H

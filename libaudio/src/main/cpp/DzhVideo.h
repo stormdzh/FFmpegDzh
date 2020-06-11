@@ -6,7 +6,7 @@
 #define FFMPEGDZH_DZHVIDEO_H
 
 #include "DzhQueue.h"
-#include "DzgCallJava.h"
+#include "DzhCallJava.h"
 #include "DzhAudio.h"
 
 
